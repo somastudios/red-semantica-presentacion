@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo hacer un hitazo</title>
+<meta name="description" content="Red semántica del proceso de producción musical: composición, diseño de sonido, mezcla y masterización.">
+<style>
+@font-face{font-family:"Serif";src:url(data:font/woff2;base64,@@FONT_SERIF@@) format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Serif";src:url(data:font/woff2;base64,@@FONT_SERIF_ITALIC@@) format("woff2");font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:"Geist";src:url(data:font/woff2;base64,@@FONT_GEIST@@) format("woff2");font-weight:100 900;font-style:normal;font-display:block}
+@font-face{font-family:"Mono";src:url(data:font/woff2;base64,@@FONT_MONO@@) format("woff2");font-weight:400;font-style:normal;font-display:block}
+
+:root{
+  --bg:#12110F; --bg2:#1A1815; --bg3:#221F1B; --line:#2E2A25; --line2:#3D3832;
+  --ink:#EEE7DB; --ink2:#CFC7BA; --muted:#A1998D; --dim:#6E675D; --edge:#8F877B;
+  --comp:#E9B44C; --diseno:#F07155; --mezcla:#45C4B0; --master:#A393F5; --dist:#D9CFBF; --root:#EEE7DB;
+  --serif:"Serif",Georgia,serif; --sans:"Geist",system-ui,sans-serif; --mono:"Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(120% 90% at 70% 30%,#1B1916 0%,var(--bg) 60%,#0D0C0B 100%)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+/* ---------- stage ---------- */
+#stage{position:fixed;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%;transform:translate(-50%,-50%)}
+#fx,#graph,#scope{position:absolute;inset:0;width:1600px;height:900px}
+#fx{z-index:0;pointer-events:none}
+#scope{z-index:1;pointer-events:none;opacity:.55}
+#graph{z-index:2;overflow:visible}
+#scrim{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,var(--bg) 0%,rgba(18,17,15,.96) 36%,rgba(18,17,15,.6) 44%,rgba(18,17,15,0) 52%)}
+#scrim.infer{background:linear-gradient(90deg,var(--bg) 0,rgba(18,17,15,.95) 445px,rgba(18,17,15,0) 540px),linear-gradient(180deg,rgba(18,17,15,.9) 0,rgba(18,17,15,0) 200px)}
+.slides{position:absolute;inset:0;z-index:4;pointer-events:none}
+.slide{position:absolute;inset:0;visibility:hidden}
+.slide.on{pointer-events:none}
+.slide.on .hit{pointer-events:auto}
+.grain{position:fixed;inset:-50%;z-index:20;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.playhead{position:absolute;top:0;bottom:0;left:0;width:2px;z-index:6;pointer-events:none;opacity:0;
+  background:linear-gradient(180deg,transparent,var(--ink) 18%,var(--ink) 82%,transparent);box-shadow:0 0 24px 4px rgba(238,231,219,.35)}
+.playhead::before{content:"";position:absolute;top:58px;left:-7px;border:8px solid transparent;border-top:10px solid var(--ink)}
+
+/* ---------- type ---------- */
+.abs{position:absolute}
+.eyebrow{font:400 15px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:12px}
+.eyebrow i{width:9px;height:9px;border-radius:50%;background:var(--c,var(--ink));display:inline-block;box-shadow:0 0 14px var(--c,var(--ink))}
+.display{font:400 176px/.9 var(--serif);letter-spacing:-.025em}
+.h2{font:400 74px/1.02 var(--serif);letter-spacing:-.018em;text-wrap:balance}
+.h2.sm{font-size:56px}
+.h2.md{font-size:64px}
+em{font-style:italic}
+.grad{background:linear-gradient(100deg,var(--comp) 10%,var(--diseno) 55%,var(--master) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.08em}
+.lead{font:400 25px/1.5 var(--sans);color:var(--ink2);text-wrap:pretty}
+.lead.sm{font-size:21px;line-height:1.52}
+.lead b{color:var(--ink);font-weight:500}
+.mono{font-family:var(--mono)}
+.muted{color:var(--muted)}
+.split-line{padding-bottom:.06em}
+
+/* ---------- graph ---------- */
+.node rect{fill:var(--bg2);stroke:var(--c);stroke-width:1.5}
+.node text{fill:var(--ink);font:400 15px var(--sans);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.node.hub rect{fill:var(--c);stroke:none}
+.node.hub text{fill:#141210;font-weight:600;font-size:17px}
+.node{cursor:default}
+#graph.interactive .node{cursor:pointer}
+.edge line{stroke:var(--edge);fill:none}
+.edge path{stroke:var(--edge);fill:var(--edge);stroke-linejoin:round}
+.edge.es_un path{fill:var(--bg)}
+.edge.usa path{fill:none}
+.edge.antes line,.edge.antes path{stroke:var(--ink2);fill:var(--ink2)}
+.edge.hot line,.edge.hot path{stroke:var(--ink)}
+.edge.hot:not(.es_un):not(.usa) path{fill:var(--ink)}
+.edge.trail line{stroke-width:3!important;stroke:var(--ink)}
+.elabel{font:400 11.5px var(--mono);fill:var(--ink2);text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
+.tip{position:absolute;z-index:8;pointer-events:none;width:280px;padding:14px 16px;border-radius:14px;background:rgba(26,24,21,.94);
+  border:1px solid var(--line2);backdrop-filter:blur(8px);opacity:0;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.tip b{display:block;font:500 16px var(--sans);margin-bottom:4px;color:var(--c)}
+.tip span{font:400 14.5px/1.45 var(--sans);color:var(--ink2)}
+
+/* ---------- ui ---------- */
+.chip{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line2);
+  font:400 14px var(--mono);color:var(--ink2);background:rgba(26,24,21,.7);transition:background .25s,border-color .25s,color .25s}
+.chip:hover{border-color:var(--dim);color:var(--ink)}
+.chip.on{background:var(--ink);color:#141210;border-color:var(--ink)}
+.chip.on svg *{stroke:#141210!important}
+.chip.on svg .fillc{fill:#141210!important}
+.chip.on svg .fillbg{fill:var(--ink)!important}
+.panel{border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,rgba(34,31,27,.7),rgba(26,24,21,.55));backdrop-filter:blur(6px)}
+.lab{width:560px;padding:22px 24px}
+.lab-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.lab-title{font:400 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs .chip{height:36px;padding:0 14px;font-size:13.5px}
+.play{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 18px 0 8px;border-radius:999px;background:var(--ink);color:#141210;font:500 15px var(--sans)}
+.play .ic{width:26px;height:26px;border-radius:50%;background:#141210;display:grid;place-items:center}
+.play .ic::before{content:"";border-left:9px solid var(--ink);border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:3px}
+.play.on .ic::before{border:0;width:9px;height:9px;background:var(--ink);margin:0}
+.play.ghost{background:transparent;color:var(--ink);border:1px solid var(--line2)}
+.play.ghost .ic{background:var(--ink)}
+.play.ghost .ic::before{border-left-color:#141210}
+.play.ghost.on{border-color:var(--ink)}
+.cap{font:400 16px/1.5 var(--sans);color:var(--ink2);min-height:48px}
+.wavebox{height:150px;margin:6px 0 10px;position:relative}
+.wavebox svg{width:100%;height:100%;overflow:visible}
+.wavebox .axis{stroke:var(--line2);stroke-dasharray:2 6}
+.wavebox .lbl{position:absolute;right:0;top:0;font:400 12px var(--mono);color:var(--dim);letter-spacing:.08em}
+
+#ui{position:fixed;left:0;right:0;bottom:0;height:56px;z-index:30;display:flex;align-items:center;gap:22px;padding:0 26px;pointer-events:none}
+#ui > *{pointer-events:auto}
+.prog{flex:1;display:flex;gap:5px;height:16px;align-items:center}
+.prog span{flex:1;height:16px;position:relative;cursor:pointer}
+.prog span::before,.prog span::after{content:"";position:absolute;left:0;right:0;top:6.5px;height:3px;border-radius:2px;background:rgba(238,231,219,.14)}
+.prog span::after{background:var(--c,var(--ink));transform:scaleX(0);transform-origin:left;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.prog span.done::after{transform:scaleX(1)}
+.prog span:hover::before{background:rgba(238,231,219,.3)}
+.count{font:400 13px var(--mono);color:var(--muted);letter-spacing:.08em;min-width:210px;text-align:right;white-space:nowrap}
+.navb{width:36px;height:36px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;color:var(--ink2)}
+.navb:hover{border-color:var(--ink2);color:var(--ink)}
+.navb svg{width:16px;height:16px}
+#notes{position:fixed;left:26px;bottom:70px;z-index:31;width:min(520px,calc(100vw - 52px));padding:18px 20px;border-radius:16px;
+  background:rgba(20,18,16,.96);border:1px solid var(--line2);font:400 16px/1.55 var(--sans);color:var(--ink2);display:none}
+#notes.on{display:block}
+#notes b{font:400 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px}
+#hint{position:fixed;right:26px;top:22px;z-index:31;font:400 12px var(--mono);color:var(--dim);letter-spacing:.08em;transition:opacity .6s}
+
+/* ---------- slide specifics ---------- */
+.team{font:400 15px var(--mono);color:var(--muted);letter-spacing:.06em}
+.kbd{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border:1px solid var(--line2);border-radius:7px;font:400 12px var(--mono);color:var(--ink2);margin:0 2px}
+.mini text{font:400 18px var(--sans);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.mini .lab2{font:400 14px var(--mono);fill:var(--ink2);paint-order:stroke;stroke:var(--bg);stroke-width:6px}
+.cite{font:400 14px var(--mono);color:var(--dim);letter-spacing:.04em}
+
+.rels{display:grid;grid-template-columns:200px 200px 1fr 1fr;column-gap:36px;row-gap:0}
+.rel-row{display:contents}
+.rel-row > *{padding:24px 0;border-top:1px solid var(--line);display:flex;align-items:center}
+.rel-name{font:400 21px var(--mono);color:var(--ink)}
+.rel-desc{font:400 19px/1.45 var(--sans);color:var(--ink2)}
+.rel-ex{font:400 italic 25px/1.3 var(--serif);color:var(--ink)}
+
+.triples{display:flex;flex-direction:column;gap:14px}
+.triple{display:grid;grid-template-columns:230px 250px 230px;align-items:center;gap:0}
+.triple .pill:first-child{justify-self:end;margin-right:14px}
+.triple .pill:last-child{margin-left:14px}
+.pill{justify-self:start;display:inline-flex;align-items:center;height:42px;padding:0 18px;border-radius:999px;border:1.5px solid var(--c);background:var(--bg2);font:400 17px var(--sans);white-space:nowrap}
+.triple .pill:last-child{justify-self:start}
+.triple .rel{position:relative;height:42px;display:flex;align-items:center;justify-content:center}
+.triple .rel svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.triple .rel span{position:relative;font:400 13.5px var(--mono);color:var(--ink2);background:var(--bg);padding:2px 8px;border-radius:6px;transform:translateY(-15px)}
+.code{font:400 17px var(--mono);color:var(--muted)}
+.code b{color:var(--comp);font-weight:400}
+.code s{text-decoration:none;color:var(--diseno)}
+.code u{text-decoration:none;color:var(--mezcla)}
+
+.filters{display:flex;gap:8px;justify-content:flex-end}
+.qlist{display:flex;flex-direction:column;gap:10px;width:350px}
+.q{text-align:left;padding:14px 18px;border-radius:16px;border:1px solid var(--line);background:rgba(26,24,21,.75);font:400 17px/1.35 var(--sans);color:var(--ink2);transition:all .3s}
+.q:hover{border-color:var(--dim);color:var(--ink)}
+.q.on{background:var(--ink);color:#141210;border-color:var(--ink)}
+.q small{display:block;font:400 11.5px var(--mono);letter-spacing:.1em;color:var(--dim);margin-bottom:4px}
+.q.on small{color:#5d564c}
+.answer{display:flex;flex-direction:column;justify-content:center;gap:16px;padding:22px 30px}
+.chain{display:flex;align-items:center;flex-wrap:wrap;gap:10px;min-height:44px}
+.chain .pill{height:40px;font-size:16px}
+.chain .arr{font:400 13.5px var(--mono);color:var(--ink2);display:flex;align-items:center;gap:8px}
+.chain .arr::after{content:"";width:34px;height:1.5px;background:var(--ink2);display:block}
+.chain .arr.no{color:var(--diseno)}
+.chain .arr.no::after{background:repeating-linear-gradient(90deg,var(--diseno) 0 5px,transparent 5px 9px)}
+.ans{font:400 20px/1.45 var(--sans);color:var(--ink2)}
+.ans b{font:400 italic 30px var(--serif);color:var(--ink);margin-right:10px}
+
+.checks{display:flex;flex-direction:column;gap:0;width:640px}
+.check{display:grid;grid-template-columns:56px 1fr;gap:6px 18px;padding:28px 0;border-top:1px solid var(--line)}
+.check .ok{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--mezcla);display:grid;place-items:center;grid-row:span 2}
+.check .ok svg{width:20px;height:20px}
+.check h4{font:400 26px/1.2 var(--serif)}
+.check p{font:400 17px/1.5 var(--sans);color:var(--muted)}
+.stats{display:flex;gap:56px}
+.stat b{display:block;font:400 92px/1 var(--serif);letter-spacing:-.02em}
+.stat span{font:400 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+.chords{display:flex;gap:10px;margin:4px 0 16px}
+.chord{flex:1;height:86px;border-radius:14px;border:1px solid var(--line2);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;transition:all .25s}
+.chord b{font:400 34px var(--serif)}
+.chord span{font:400 12px var(--mono);color:var(--muted);letter-spacing:.1em}
+.chord.on{background:var(--comp);border-color:var(--comp);color:#141210;transform:translateY(-4px)}
+.chord.on span{color:#3b2f17}
+.stereo{position:relative;height:150px;margin:6px 0 10px}
+.stereo .track{position:absolute;left:20px;right:20px;top:70px;height:2px;background:var(--line2)}
+.stereo .tick{position:absolute;top:58px;width:1px;height:26px;background:var(--line2)}
+.stereo .lr{position:absolute;top:102px;font:400 12px var(--mono);color:var(--dim);letter-spacing:.1em;transform:translateX(-50%)}
+.stereo .dot{position:absolute;top:71px;left:50%;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:var(--mezcla);box-shadow:0 0 30px var(--mezcla)}
+.bars{display:flex;align-items:center;gap:4px;height:150px;margin:6px 0 10px}
+.bars i{flex:1;height:100%;background:var(--master);border-radius:3px;transform:scaleY(.1);opacity:.9}
+.meter{display:flex;align-items:center;gap:14px;font:400 13px var(--mono);color:var(--muted)}
+.meter .bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--mezcla),var(--comp) 70%,var(--diseno))}
+.fact{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:16px;border:1px dashed var(--line2);font:400 16px/1.5 var(--sans);color:var(--ink2)}
+.fact b{font:400 12px var(--mono);letter-spacing:.12em;color:var(--master);text-transform:uppercase;white-space:nowrap;padding-top:3px}
+
+@media (prefers-reduced-motion:reduce){.playhead{display:none}}
+@media (max-width:760px){.count{min-width:0;font-size:11px}.count .lbl,#hint{display:none}#ui{gap:12px;padding:0 14px}}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div id="hint">← → para avanzar · N notas · F pantalla completa</div>
+
+<div id="stage">
+  <!-- background: morphing sound rings -->
+  <svg id="fx" viewBox="0 0 1600 900" aria-hidden="true">
+    <defs>
+      <filter id="boil" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence id="boilT" type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="1" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <linearGradient id="ringG" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#E9B44C"/><stop offset=".5" stop-color="#F07155"/><stop offset="1" stop-color="#A393F5"/>
+      </linearGradient>
+    </defs>
+    <g id="blobWrap" filter="url(#boil)">
+      <g id="blob">
+        <path id="ring1" fill="none" stroke="url(#ringG)" stroke-width="2.2"/>
+        <path id="ring2" fill="none" stroke="url(#ringG)" stroke-width="1.4" opacity=".55"/>
+        <path id="ring3" fill="none" stroke="url(#ringG)" stroke-width="1" opacity=".3"/>
+      </g>
+    </g>
+  </svg>
+  <canvas id="scope" width="1600" height="900"></canvas>
+  <svg id="graph" viewBox="0 0 1600 900" role="img" aria-label="Red semántica de la producción musical">
+    <g id="gEdges" filter="url(#boil)"></g>
+    <g id="gLabels"></g>
+    <g id="gNodes"></g>
+  </svg>
+  <div id="scrim"></div>
+  <div class="tip" id="tip"><b></b><span></span></div>
+
+  <div class="slides">
+
+    <!-- 0 · Portada -->
+    <section class="slide" data-id="hero" data-label="Portada"
+      data-notes="Presentarnos. Vamos a explicar cómo se produce una canción, de la idea al master, usando una red semántica. Spoiler: la red no hace hits, pero sí explica todo lo que hay detrás de uno.">
+      <div class="abs eyebrow" style="left:100px;top:150px" data-a><i style="--c:var(--comp)"></i>Introducción a la IA · Actividad 2 · Red semántica</div>
+      <h1 class="abs display split" style="left:92px;top:205px;width:900px">Cómo hacer<br>un <em class="grad">hitazo</em></h1>
+      <p class="abs lead" style="left:100px;top:585px;width:600px" data-a>Todo lo que pasa entre una idea y una canción terminada, contado como una red semántica.</p>
+      <p class="abs team" style="left:100px;top:770px" data-a id="team"></p>
+    </section>
+
+    <!-- 1 · Qué es -->
+    <section class="slide" data-id="que" data-label="Qué es" data-steps="2"
+      data-notes="Definición: nodos = conceptos, arcos = relaciones con nombre. Avanzar: aparecen las flechas. Avanzar otra vez: la herencia. La reverb no dice en ningún lado que es parte del diseño de sonido, pero la red lo deduce.">
+      <div class="abs eyebrow" style="left:100px;top:130px" data-a><i></i>Antes de empezar</div>
+      <h2 class="abs h2 split" style="left:96px;top:175px;width:640px">Una red semántica es un mapa de lo que sabemos.</h2>
+      <p class="abs lead" style="left:100px;top:440px;width:600px" data-a>Los conceptos son <b>nodos</b>. Las relaciones son <b>flechas con nombre</b>. Ese nombre es lo importante: le dice a una computadora qué significa la conexión, no solo que existe.</p>
+      <p class="abs cite" style="left:100px;top:780px" data-a>Propuesta por M. Ross Quillian en 1968 para modelar la memoria semántica.</p>
+      <svg class="abs mini" id="mini" data-a style="left:760px;top:150px;width:800px;height:620px" viewBox="0 0 800 620"></svg>
+      <p class="abs lead sm" style="left:860px;top:720px;width:620px" data-a data-step="2">Si la reverb es un efecto de tiempo, <b>hereda</b> todo lo que sabemos de los efectos de tiempo. La red lo deduce sin que nadie lo escriba.</p>
+    </section>
+
+    <!-- 2 · Relaciones -->
+    <section class="slide" data-id="rels" data-label="Las flechas"
+      data-notes="Cinco tipos de relación. Cada una se dibuja distinto. 'Es un' crea jerarquías y permite herencia; 'parte de' arma el todo; 'usa' son herramientas; 'afecta' es causa y efecto; 'va antes de' es el orden del proceso.">
+      <div class="abs eyebrow" style="left:100px;top:100px" data-a><i></i>Las flechas</div>
+      <h2 class="abs h2 split" style="left:96px;top:140px;width:1100px">Usamos cinco tipos de relación.</h2>
+      <div class="abs rels" style="left:100px;top:290px;width:1400px" id="relsGrid"></div>
+    </section>
+
+    <!-- 3 · Paso 1 -->
+    <section class="slide" data-id="paso1" data-label="Paso 1 · Conceptos" data-steps="1"
+      data-notes="Paso 1 de la actividad: identificar conceptos. Primero salen todos revueltos, como lluvia de ideas. Avanzar: se ordenan por etapa. Ahí ya se ven las jerarquías.">
+      <div class="abs eyebrow" style="left:100px;top:80px" data-a><i style="--c:var(--comp)"></i>Paso 1 de 3 · Conceptos</div>
+      <h2 class="abs h2 sm split" style="left:96px;top:118px;width:900px">Primero, juntamos los conceptos.</h2>
+      <p class="abs lead sm" style="left:100px;top:200px;width:820px" data-a data-until="0">Anotamos todo lo que interviene en producir una canción. Salieron <b class="nN"></b> conceptos.</p>
+      <p class="abs lead sm" style="left:100px;top:200px;width:820px" data-a data-step="1">Luego los agrupamos por etapa. Ahí empezaron a aparecer las jerarquías.</p>
+    </section>
+
+    <!-- 4 · Paso 2 -->
+    <section class="slide" data-id="paso2" data-label="Paso 2 · Relaciones"
+      data-notes="Paso 2: establecer relaciones. Cada relación es una tripleta: sujeto, relación, objeto. Así la guarda una computadora; leerlas en voz alta: la saturación es una distorsión, etcétera.">
+      <div class="abs eyebrow" style="left:100px;top:130px" data-a><i style="--c:var(--diseno)"></i>Paso 2 de 3 · Relaciones</div>
+      <h2 class="abs h2 split" style="left:96px;top:175px;width:560px">Luego, conectamos cada par.</h2>
+      <p class="abs lead sm" style="left:100px;top:385px;width:520px" data-a>Cada conexión se lee como una oración de tres partes: <b>sujeto</b>, <b>relación</b> y <b>objeto</b>. Así es como también la guardaría una computadora.</p>
+      <p class="abs code" style="left:100px;top:600px;width:540px" data-a>(<b>saturación</b>, <s>es_un</s>, <u>distorsión</u>)</p>
+      <p class="abs cite" style="left:100px;top:650px" data-a>En total: <span class="nE"></span> relaciones.</p>
+      <div class="abs triples" style="left:740px;top:165px" id="triples" data-a></div>
+    </section>
+
+    <!-- 5 · Paso 3 -->
+    <section class="slide" data-id="paso3" data-label="Paso 3 · La red"
+      data-notes="Paso 3: dibujar la red. Las cuatro etapas van en orden con 'va antes de'. Pasar el cursor por un concepto muestra sus relaciones. Se pueden filtrar por tipo de relación. Ahora vamos por partes.">
+      <div class="abs eyebrow" style="left:90px;top:70px" data-a><i style="--c:var(--mezcla)"></i>Paso 3 de 3 · La red</div>
+      <h2 class="abs h2 sm split" style="left:86px;top:104px;width:700px">Y así se ve todo junto.</h2>
+      <div class="abs filters hit" style="right:60px;top:72px" id="filters" data-a></div>
+      <p class="abs cite" style="right:62px;top:130px;text-align:right" data-a>Pasa el cursor sobre un concepto para ver sus relaciones.</p>
+    </section>
+
+    <!-- 6 · Composición -->
+    <section class="slide" data-id="comp" data-label="Etapa 1 · Composición" data-stage="comp"
+      data-notes="La composición es la raíz. No hay plugins todavía. Tocar la progresión I–V–vi–IV: es la de miles de canciones pop. El gancho es un tipo de melodía y casi siempre vive en el coro.">
+      <div class="abs eyebrow" style="left:90px;top:100px;--c:var(--comp)" data-a><i></i>Etapa 1 · Composición</div>
+      <h2 class="abs h2 md split" style="left:86px;top:140px;width:560px">Todo empieza con la canción.</h2>
+      <p class="abs lead sm" style="left:90px;top:300px;width:540px" data-a>Aquí todavía no hay plugins. Hay melodía, armonía, ritmo, letra y estructura. Es la raíz de la red: lo que no esté aquí, ninguna etapa posterior lo agrega.</p>
+      <div class="abs panel lab hit" style="left:90px;top:520px" data-a>
+        <div class="lab-top"><span class="lab-title">La progresión del pop</span>
+          <button class="play" id="playChords"><span class="ic"></span><span class="t">Escuchar</span></button></div>
+        <div class="chords" id="chords">
+          <div class="chord"><b>C</b><span>I</span></div><div class="chord"><b>G</b><span>V</span></div>
+          <div class="chord"><b>Am</b><span>vi</span></div><div class="chord"><b>F</b><span>IV</span></div>
+        </div>
+        <p class="cap">Do, Sol, La menor, Fa. Si te suena a mil canciones, es porque está en mil canciones.</p>
+      </div>
+    </section>
+
+    <!-- 7 · Diseño -->
+    <section class="slide" data-id="diseno" data-label="Etapa 2 · Diseño de sonido" data-stage="diseno"
+      data-notes="El diseño de sonido trabaja sobre el timbre. Probar cada botón: seno puro, AM, FM, saturación y filtro peine. Remarcar la herencia: la saturación es una distorsión, entonces también genera armónicos.">
+      <div class="abs eyebrow" style="left:90px;top:100px;--c:var(--diseno)" data-a><i></i>Etapa 2 · Diseño de sonido</div>
+      <h2 class="abs h2 md split" style="left:86px;top:140px;width:560px">Después, decidimos cómo suena cada cosa.</h2>
+      <p class="abs lead sm" style="left:90px;top:360px;width:540px" data-a>El diseño de sonido trabaja sobre el <b>timbre</b>: lo que hace que un piano y una guitarra suenen distinto aunque toquen la misma nota.</p>
+      <div class="abs panel lab hit" style="left:90px;top:530px" data-a>
+        <div class="lab-top"><div class="tabs" id="waveTabs"></div></div>
+        <div class="wavebox"><span class="lbl" id="waveLbl">FORMA DE ONDA</span>
+          <svg viewBox="0 0 512 150" preserveAspectRatio="none"><line class="axis" x1="0" x2="512" y1="75" y2="75"/>
+            <path id="wavePath" fill="none" stroke="var(--diseno)" stroke-width="2.4" stroke-linejoin="round"/></svg></div>
+        <p class="cap" id="waveCap"></p>
+      </div>
+    </section>
+
+    <!-- 8 · Mezcla -->
+    <section class="slide" data-id="mezcla" data-label="Etapa 3 · Mezcla" data-stage="mezcla"
+      data-notes="Mezcla estática: niveles y paneo, quieta. Mezcla dinámica: automatización, se mueve. Demo de paneo (mejor con audífonos o bocinas estéreo) y demo de fase: dos ondas iguales, se invierte una y desaparece el sonido.">
+      <div class="abs eyebrow" style="left:90px;top:100px;--c:var(--mezcla)" data-a><i></i>Etapa 3 · Mezcla</div>
+      <h2 class="abs h2 md split" style="left:86px;top:140px;width:560px">Luego, hacemos que todo quepa.</h2>
+      <p class="abs lead sm" style="left:90px;top:300px;width:540px" data-a>Mezclar es repartir espacio: en volumen, en frecuencia, en estéreo y en el tiempo. Primero se deja quieta <span class="muted">(mezcla estática)</span> y luego se le da movimiento <span class="muted">(mezcla dinámica)</span>.</p>
+      <div class="abs panel lab hit" style="left:90px;top:520px" data-a>
+        <div class="lab-top"><div class="tabs" id="mixTabs">
+          <button class="chip on" data-m="paneo">Paneo</button><button class="chip" data-m="fase">Fase</button></div>
+          <div style="display:flex;gap:8px"><button class="play ghost" id="phaseBtn" style="display:none"><span class="ic"></span><span class="t">Invertir fase</span></button>
+          <button class="play" id="playMix"><span class="ic"></span><span class="t">Escuchar</span></button></div></div>
+        <div class="stereo" id="stereoBox">
+          <div class="track"></div><div class="tick" style="left:20px"></div><div class="tick" style="left:50%"></div><div class="tick" style="right:20px"></div>
+          <span class="lr" style="left:20px">IZQ</span><span class="lr" style="left:50%">CENTRO</span><span class="lr" style="left:calc(100% - 20px)">DER</span>
+          <div class="dot" id="panDot"></div>
+        </div>
+        <div class="wavebox" id="phaseBox" style="display:none">
+          <svg viewBox="0 0 512 150" preserveAspectRatio="none">
+            <path id="phA" fill="none" stroke="var(--mezcla)" stroke-width="2" opacity=".8"/>
+            <path id="phB" fill="none" stroke="var(--comp)" stroke-width="2" opacity=".8"/>
+            <path id="phS" fill="none" stroke="var(--ink)" stroke-width="2.6"/>
+          </svg>
+        </div>
+        <p class="cap" id="mixCap"></p>
+      </div>
+    </section>
+
+    <!-- 9 · Master -->
+    <section class="slide" data-id="master" data-label="Etapa 4 · Masterización" data-stage="master"
+      data-notes="La masterización trabaja sobre la mezcla terminada. Prender y apagar el limitador: suena más fuerte pero pierde dinámica. En la red: el limitador es un tipo de compresión, por eso hereda que controla el rango dinámico. Dato de Spotify: normaliza a −14 LUFS.">
+      <div class="abs eyebrow" style="left:90px;top:100px;--c:var(--master)" data-a><i></i>Etapa 4 · Masterización</div>
+      <h2 class="abs h2 md split" style="left:86px;top:140px;width:560px">Al final, la preparamos para el mundo.</h2>
+      <p class="abs lead sm" style="left:90px;top:300px;width:540px" data-a>La masterización trabaja sobre la mezcla terminada, no sobre pistas sueltas. Ajusta el tono general, el estéreo y el volumen final.</p>
+      <div class="abs panel lab hit" style="left:90px;top:470px" data-a>
+        <div class="lab-top"><button class="play ghost" id="limBtn"><span class="ic"></span><span class="t">Limitador: apagado</span></button>
+          <button class="play" id="playMaster"><span class="ic"></span><span class="t">Escuchar</span></button></div>
+        <div class="bars" id="bars"></div>
+        <div class="meter"><span>NIVEL</span><div class="bar"><i id="meterI"></i></div><span id="meterT">— dB</span></div>
+      </div>
+      <div class="abs fact" style="left:90px;top:790px;width:560px" data-a><b>Dato</b><span>Spotify normaliza a −14 LUFS. Si tu master suena más fuerte, la plataforma le baja el volumen.</span></div>
+    </section>
+
+    <!-- 10 · Inferencia -->
+    <section class="slide" data-id="infer" data-label="Inferencia" data-steps="5"
+      data-notes="Para qué sirve una red semántica en IA: inferencia. Cada pregunta se responde siguiendo flechas. La última es la mejor: no existe ningún camino desde la masterización hacia la composición. El master no arregla una mala canción.">
+      <div class="abs eyebrow" style="left:90px;top:70px" data-a><i style="--c:var(--master)"></i>Para qué sirve</div>
+      <h2 class="abs h2 sm split" style="left:86px;top:104px;width:600px">La red también puede razonar.</h2>
+      <p class="abs lead sm" style="left:90px;top:186px;width:350px;font-size:18px" data-a>Siguiendo las flechas, responde preguntas que nadie escribió directo. A eso se le llama <b>inferencia</b>.</p>
+      <div class="abs qlist hit" style="left:90px;top:345px" id="qlist" data-a></div>
+      <div class="abs panel answer hit" style="left:470px;top:715px;width:1070px;height:150px" data-a id="answer">
+        <div class="chain" id="chain"></div>
+        <p class="ans" id="ansTxt"><span class="muted">Elige una pregunta.</span></p>
+      </div>
+    </section>
+
+    <!-- 11 · Cierre -->
+    <section class="slide" data-id="cierre" data-label="En resumen"
+      data-notes="Cerrar con la idea central: la red no garantiza un hit, pero muestra que cada etapa depende de la anterior. Revisar los dos objetivos de la actividad: visualizar relaciones y aplicar jerarquías.">
+      <div class="abs eyebrow" style="left:100px;top:130px" data-a><i></i>En resumen</div>
+      <h2 class="abs h2 split" style="left:96px;top:172px;width:640px;font-size:86px">La red no garantiza un hit.</h2>
+      <p class="abs lead sm" style="left:100px;top:395px;width:600px" data-a>Pero sí muestra algo útil: cada decisión depende de otra. Una buena composición facilita el diseño, un buen diseño facilita la mezcla y una buena mezcla facilita el master.</p>
+      <div class="abs stats" style="left:100px;top:640px" data-a>
+        <div class="stat"><b class="nN"></b><span>Conceptos</span></div>
+        <div class="stat"><b class="nE"></b><span>Relaciones</span></div>
+        <div class="stat"><b>5</b><span>Tipos de relación</span></div>
+      </div>
+      <div class="abs checks" style="left:860px;top:250px">
+        <div class="check" data-a><div class="ok"><svg viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9" fill="none" stroke="var(--mezcla)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h4>Visualizar relaciones entre conceptos</h4><p>Cada flecha tiene nombre y tipo. La red se puede leer como oraciones.</p></div>
+        <div class="check" data-a><div class="ok"><svg viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9" fill="none" stroke="var(--mezcla)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h4>Aplicar jerarquías conceptuales</h4><p><span class="nIs"></span> relaciones <i>es un</i> y <span class="nPart"></span> <i>parte de</i>. Con ellas la red hereda propiedades y responde preguntas.</p></div>
+        <div class="check" data-a style="border-bottom:1px solid var(--line)"><div class="ok"><svg viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9" fill="none" stroke="var(--mezcla)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h4>Dibujar la red con nodos y enlaces</h4><p>Cuatro etapas, un orden y muchas conexiones cruzadas entre ellas.</p></div>
+      </div>
+    </section>
+
+    <!-- 12 · Gracias -->
+    <section class="slide" data-id="fin" data-label="Gracias"
+      data-notes="Gracias. Abrir a preguntas.">
+      <h1 class="abs display split" style="left:0;top:330px;width:1600px;text-align:center;font-size:200px">Gracias.</h1>
+      <p class="abs lead" style="left:0;top:560px;width:1600px;text-align:center" data-a>¿Preguntas?</p>
+    </section>
+
+  </div>
+  <div class="playhead" id="playhead"></div>
+</div>
+
+<div id="ui">
+  <button class="navb" id="prevB" aria-label="Anterior"><svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button class="navb" id="nextB" aria-label="Siguiente"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <div class="prog" id="prog"></div>
+  <div class="count" id="count"></div>
+</div>
+<div id="notes"><b>Notas para quien expone</b><span id="notesT"></span></div>
+
+<script>/*@@GSAP@@*/</script>
+<script>/*@@MORPH@@*/</script>
+<script>/*@@SPLIT@@*/</script>
+<script>
+/* ============================================================
+   Edita aquí los nombres del equipo
+   ============================================================ */
+const EQUIPO = "Equipo: Nombre Apellido · Nombre Apellido · Nombre Apellido";
+
+const GRAPH = /*@@GRAPH@@*/null;
+const LAYOUT = /*@@LAYOUT@@*/null;
+
+gsap.registerPlugin(MorphSVGPlugin, SplitText);
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs = {}, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+const STAGE_COLOR = k => `var(--${k})`;
+
+/* ---------------- stage scaling ---------------- */
+const stage = $('#stage');
+function fit() { const s = Math.min(innerWidth / 1600, (innerHeight - 40) / 900); stage.style.transform = `translate(-50%,-50%) translateY(-14px) scale(${s})`; }
+addEventListener('resize', fit); fit();
+
+/* ---------------- relation styles ---------------- */
+const REL = {
+  es_un:    { name: 'es un',       desc: 'Jerarquía. Lo de abajo hereda todo lo de arriba.', ex: 'La saturación es una distorsión.', dash: '', w: 1.7, head: 'hollow', back: 13 },
+  parte_de: { name: 'parte de',    desc: 'Composición. Una pieza dentro de algo mayor.', ex: 'La melodía es parte de la composición.', dash: '6 5', w: 1.5, head: 'diamond', back: 12 },
+  usa:      { name: 'usa',         desc: 'Herramienta. Lo que se necesita para lograrlo.', ex: 'La mezcla dinámica usa automatización.', dash: '0.1 6', w: 2.4, head: 'chevron', back: 2, cap: 'round' },
+  afecta:   { name: 'afecta',      desc: 'Efecto. Se lee con su verbo: genera, modifica, controla.', ex: 'La distorsión genera armónicos.', dash: '12 4 2 4', w: 1.5, head: 'tri', back: 9 },
+  antes:    { name: 'va antes de', desc: 'Orden. La única relación que habla de tiempo.', ex: 'La mezcla va antes del master.', dash: '', w: 3, head: 'tri', back: 9 },
+};
+const HEAD = {
+  hollow: 'M0,0 L-13,-7 L-13,7 Z',
+  tri: 'M0,0 L-11,-6 L-11,6 Z',
+  diamond: 'M0,0 L-6,-4.5 L-12,0 L-6,4.5 Z',
+  chevron: 'M-10,-6.5 L0,0 L-10,6.5',
+};
+function relSample(type, w = 150, color) {
+  const r = REL[type]; const c = color || (type === 'antes' ? 'var(--ink2)' : 'var(--edge)');
+  const y = 12, x1 = 4, x2 = w - 4;
+  const fill = r.head === 'hollow' ? 'var(--bg)' : r.head === 'chevron' ? 'none' : c;
+  return `<svg width="${w}" height="24" viewBox="0 0 ${w} 24" style="overflow:visible"><line x1="${x1}" y1="${y}" x2="${x2 - r.back}" y2="${y}" stroke="${c}" stroke-width="${r.w}" stroke-dasharray="${r.dash}" stroke-linecap="${r.cap || 'butt'}"/><path class="${fill === c ? 'fillc' : fill === 'none' ? '' : 'fillbg'}" d="${HEAD[r.head]}" transform="translate(${x2},${y})" stroke="${c}" stroke-width="1.5" stroke-linejoin="round" fill="${fill}"/></svg>`;
+}
+
+/* ---------------- graph model ---------------- */
+const nodes = GRAPH.nodes.map(n => ({ ...n, x: LAYOUT[n.id][0], y: LAYOUT[n.id][1] }));
+const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+const edges = GRAPH.edges.map(([s, type, label, t], i) => ({ i, s, t, type, label }));
+const STAGES = ['comp', 'diseno', 'mezcla', 'master', 'dist'];
+$$('.nN').forEach(e => e.textContent = nodes.length);
+$$('.nE').forEach(e => e.textContent = edges.length);
+$$('.nIs').forEach(e => e.textContent = edges.filter(e => e.type === 'es_un').length);
+$$('.nPart').forEach(e => e.textContent = edges.filter(e => e.type === 'parte_de').length);
+$('#team').textContent = EQUIPO;
+
+/* layouts: scatter / grid / net */
+const LAY = { net: {}, grid: {}, scatter: {} };
+nodes.forEach(n => LAY.net[n.id] = { x: n.x, y: n.y, r: 0 });
+(function buildGrid() {
+  const cols = { comp: [180], diseno: [455, 680], mezcla: [945, 1170], master: [1430] };
+  const hubs = { comp: [180, 330], diseno: [567, 330], mezcla: [1057, 330], master: [1430, 330] };
+  for (const st of ['comp', 'diseno', 'mezcla', 'master']) {
+    const list = nodes.filter(n => n.stage === st && !n.hub);
+    const c = cols[st]; const per = Math.ceil(list.length / c.length);
+    LAY.grid[nodes.find(n => n.stage === st && n.hub).id] = { x: hubs[st][0], y: hubs[st][1], r: 0 };
+    list.forEach((n, k) => { const col = Math.floor(k / per), row = k % per; LAY.grid[n.id] = { x: c[col], y: 405 + row * 52, r: 0 }; });
+  }
+  LAY.grid.distribucion = { x: 1430, y: 560, r: 0 };
+  LAY.grid.normalizacion = { x: 1430, y: 625, r: 0 };
+  LAY.grid.produccion = { x: 1250, y: 150, r: 0 };
+  let s = 9; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  nodes.forEach(n => LAY.scatter[n.id] = { x: 120 + rnd() * 1360, y: 320 + rnd() * 520, r: (rnd() - .5) * 18 });
+})();
+
+function relaxScatter() {
+  const P = nodes.map(n => ({ n, p: LAY.scatter[n.id] }));
+  for (let it = 0; it < 300; it++) {
+    for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+      const a = P[i], b = P[j]; const dx = b.p.x - a.p.x, dy = b.p.y - a.p.y;
+      const ox = (a.n.w + b.n.w) / 2 + 16 - Math.abs(dx), oy = (a.n.h + b.n.h) / 2 + 14 - Math.abs(dy);
+      if (ox > 0 && oy > 0) { if (ox < oy * 2.5) { const m = ox / 2 * Math.sign(dx || 1); a.p.x -= m; b.p.x += m; } else { const m = oy / 2 * Math.sign(dy || 1); a.p.y -= m; b.p.y += m; } }
+    }
+    P.forEach(({ n, p }) => { p.x = Math.max(70 + n.w / 2, Math.min(1530 - n.w / 2, p.x)); p.y = Math.max(320, Math.min(840, p.y)); });
+  }
+}
+/* ---------------- graph rendering ---------------- */
+const G = $('#graph'), gE = $('#gEdges'), gL = $('#gLabels'), gN = $('#gNodes');
+function buildGraph() {
+  nodes.forEach(n => {
+    const g = svgEl('g', { class: 'node' + (n.hub ? ' hub' : ''), 'data-id': n.id }, gN);
+    g.style.setProperty('--c', STAGE_COLOR(n.stage));
+    const r = svgEl('rect', {}, g); const t = svgEl('text', {}, g); t.textContent = n.label;
+    const tw = t.getComputedTextLength();
+    n.w = tw + (n.hub ? 44 : 32); n.h = n.hub ? 44 : 34;
+    r.setAttribute('x', -n.w / 2); r.setAttribute('y', -n.h / 2); r.setAttribute('width', n.w); r.setAttribute('height', n.h); r.setAttribute('rx', n.h / 2);
+    n.el = g;
+  });
+  relaxScatter();
+  nodes.forEach(n => gsap.set(n.el, { x: LAY.scatter[n.id].x, y: LAY.scatter[n.id].y, rotation: LAY.scatter[n.id].r, opacity: 0, transformOrigin: '50% 50%' }));
+  const inside = (n, px, py) => { const hw = n.w / 2 - n.h / 2; const cx = Math.max(n.x - hw, Math.min(n.x + hw, px)); return Math.hypot(px - cx, py - n.y) <= n.h / 2 + 4; };
+  edges.forEach(e => {
+    const a = byId[e.s], b = byId[e.t];
+    const P = t => [a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t];
+    let lo = 0, hi = 1; for (let k = 0; k < 24; k++) { const m = (lo + hi) / 2; inside(a, ...P(m)) ? lo = m : hi = m; } const t0 = hi;
+    lo = 0; hi = 1; for (let k = 0; k < 24; k++) { const m = (lo + hi) / 2; inside(b, ...P(m)) ? hi = m : lo = m; } const t1 = lo;
+    const [x1, y1] = P(t0), [x2, y2] = P(t1);
+    const ang = Math.atan2(y2 - y1, x2 - x1), len = Math.hypot(x2 - x1, y2 - y1);
+    const r = REL[e.type];
+    const ex = x2 - Math.cos(ang) * r.back, ey = y2 - Math.sin(ang) * r.back;
+    const g = svgEl('g', { class: 'edge ' + e.type }, gE);
+    const line = svgEl('line', { x1, y1, x2: x1, y2: y1, 'stroke-width': r.w, 'stroke-dasharray': r.dash, 'stroke-linecap': r.cap || 'butt' }, g);
+    const head = svgEl('path', { d: HEAD[r.head], transform: `translate(${x2},${y2}) rotate(${ang * 180 / Math.PI})`, 'stroke-width': 1.5, opacity: 0 }, g);
+    const [lx, ly] = labelSpot(e.label, x1, y1, x2, y2, ang);
+    const lab = svgEl('text', { class: 'elabel', x: lx, y: ly, opacity: 0 }, gL); lab.textContent = e.label;
+    Object.assign(e, { g, line, head, lab, x1, y1, ex, ey, len, prog: { t: 0 } });
+    gsap.set(g, { opacity: 0 });
+  });
+}
+const placedLabels = [];
+function labelSpot(text, x1, y1, x2, y2, ang) {
+  const w = text.length * 7 + 10, h = 16, nx = -Math.sin(ang), ny = Math.cos(ang);
+  for (const o of [0, 13, -13, 22, -22]) for (const t of [.42, .34, .5, .27, .58, .66, .73]) {
+    const lx = x1 + (x2 - x1) * t + nx * o, ly = y1 + (y2 - y1) * t + ny * o;
+    const r = { x0: lx - w / 2, x1: lx + w / 2, y0: ly - h / 2, y1: ly + h / 2 };
+    const hit = nodes.some(n => r.x1 > n.x - n.w / 2 - 4 && r.x0 < n.x + n.w / 2 + 4 && r.y1 > n.y - n.h / 2 - 3 && r.y0 < n.y + n.h / 2 + 3)
+      || placedLabels.some(p => r.x1 > p.x0 && r.x0 < p.x1 && r.y1 > p.y0 && r.y0 < p.y1);
+    if (!hit) { placedLabels.push(r); return [lx, ly]; }
+  }
+  let nx2 = nx, ny2 = ny; if (ny2 > 0) { nx2 = -nx; ny2 = -ny; }
+  return [(x1 + x2) / 2 + nx2 * 26, (y1 + y2) / 2 + ny2 * 26];
+}
+function setEdgeProg(e, t) { e.prog.t = t; e.line.setAttribute('x2', e.x1 + (e.ex - e.x1) * t); e.line.setAttribute('y2', e.y1 + (e.ey - e.y1) * t); e.head.setAttribute('opacity', t > .97 ? 1 : 0); }
+
+/* camera */
+const cam = { x: 0, y: 0, w: 1600, h: 900 };
+const applyCam = () => G.setAttribute('viewBox', `${cam.x} ${cam.y} ${cam.w} ${cam.h}`);
+function bbox(list) { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; list.forEach(n => { x0 = Math.min(x0, n.x - n.w / 2); x1 = Math.max(x1, n.x + n.w / 2); y0 = Math.min(y0, n.y - n.h / 2); y1 = Math.max(y1, n.y + n.h / 2); }); return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 }; }
+function fitCam(B, R, maxS) { const s = Math.min(R.w / B.w, R.h / B.h, maxS); return { x: B.x + B.w / 2 - (R.x + R.w / 2) / s, y: B.y + B.h / 2 - (R.y + R.h / 2) / s, w: 1600 / s, h: 900 / s }; }
+function camFor(key) {
+  if (key === 'full') return { x: 0, y: 0, w: 1600, h: 900 };
+  if (key === 'overview') return { x: 0, y: -40, w: 1600, h: 900 };
+  if (key === 'infer') return fitCam(bbox(nodes), { x: 460, y: 70, w: 1100, h: 620 }, 1);
+  const list = nodes.filter(n => n.stage === key || (key === 'master' && n.stage === 'dist'));
+  return fitCam(bbox(list), { x: 700, y: 80, w: 860, h: 740 }, 1.6);
+}
+function camTo(key, dur = 1.5) { const c = typeof key === 'string' ? camFor(key) : key; gsap.to(cam, { ...c, duration: dur, ease: 'expo.inOut', onUpdate: applyCam, overwrite: true }); }
+
+/* emphasis */
+function emphasize({ nodeOp, edgeOp, labelOp, hot = new Set(), trail = new Set(), dur = .5 }) {
+  nodes.forEach(n => gsap.to(n.el, { opacity: nodeOp(n), duration: dur, overwrite: 'auto' }));
+  edges.forEach(e => {
+    gsap.to(e.g, { opacity: edgeOp(e), duration: dur, overwrite: 'auto' });
+    gsap.to(e.lab, { opacity: labelOp(e), duration: dur, overwrite: 'auto' });
+    e.g.classList.toggle('hot', hot.has(e.i)); e.g.classList.toggle('trail', trail.has(e.i));
+  });
+}
+let graphState = { visible: false, layout: 'scatter', edges: false, cam: 'full', mode: 'none' };
+let edgesShown = false, relFilter = null, inferSel = null;
+
+function baseEmphasis(dur) {
+  const st = graphState;
+  if (st.mode === 'focus') {
+    const S = st.focus === 'master' ? ['master', 'dist'] : [st.focus];
+    const inS = n => S.includes(n.stage);
+    const adj = new Set(); edges.forEach(e => { if (inS(byId[e.s]) !== inS(byId[e.t])) { adj.add(e.s); adj.add(e.t); } });
+    emphasize({
+      nodeOp: n => inS(n) ? 1 : adj.has(n.id) && n.id !== 'produccion' ? .3 : .05,
+      edgeOp: e => { const a = inS(byId[e.s]), b = inS(byId[e.t]); return a && b ? 1 : (a || b) ? .45 : .03; },
+      labelOp: e => inS(byId[e.s]) && inS(byId[e.t]) ? 1 : (inS(byId[e.s]) || inS(byId[e.t])) ? .6 : 0, dur,
+    });
+  } else if (st.mode === 'infer') {
+    if (inferSel !== null) return;
+    emphasize({ nodeOp: () => .42, edgeOp: () => .22, labelOp: () => 0, dur });
+  } else if (st.mode === 'overview') {
+    emphasize({ nodeOp: () => 1, edgeOp: e => relFilter ? (e.type === relFilter ? 1 : .05) : .7, labelOp: e => relFilter && e.type === relFilter ? 1 : 0, hot: new Set(relFilter ? edges.filter(e => e.type === relFilter).map(e => e.i) : []), dur });
+  } else {
+    emphasize({ nodeOp: n => (st.layout === 'grid' && n.id === 'produccion') ? 0 : 1, edgeOp: () => 0, labelOp: () => 0, dur });
+  }
+}
+
+function applyGraph(st) {
+  const prev = graphState; graphState = { ...prev, ...st };
+  const now = graphState;
+  gsap.to(G, { autoAlpha: now.visible ? 1 : 0, duration: .7, ease: 'power2.out', overwrite: true });
+  if (now.mode === 'focus' || now.mode === 'infer') $('#scrim').classList.toggle('infer', now.mode === 'infer');
+  gsap.to('#scrim', { opacity: now.mode === 'focus' || now.mode === 'infer' ? 1 : 0, duration: .9 });
+  G.classList.toggle('interactive', now.mode === 'overview' || now.mode === 'focus');
+  let delay = 0;
+  if (!now.visible) { return; }
+  if (prev.layout !== now.layout || !prev.visible) {
+    if (edgesShown && now.layout !== 'net') hideEdges();
+    const L = LAY[now.layout];
+    nodes.forEach((n, k) => gsap.to(n.el, { x: L[n.id].x, y: L[n.id].y, rotation: L[n.id].r, scale: 1, duration: 1.4, delay: Math.random() * .25, ease: 'expo.inOut', overwrite: 'auto' }));
+    delay = prev.visible ? 1.2 : .3;
+  }
+  camTo(now.cam);
+  if (now.edges && !edgesShown) { drawEdges(delay); setTimeout(() => baseEmphasis(.6), (delay + .1) * 1000); }
+  else if (!now.edges && edgesShown) { hideEdges(); baseEmphasis(.5); }
+  else baseEmphasis(.6);
+  if (now.mode !== 'overview') { relFilter = null; $$('#filters .chip').forEach((c, i) => c.classList.toggle('on', i === 0)); }
+}
+function drawEdges(delay = 0) {
+  edgesShown = true;
+  const order = [...edges].sort((a, b) => (a.x1 - b.x1));
+  order.forEach((e, k) => {
+    gsap.set(e.g, { opacity: .7 });
+    gsap.fromTo(e.prog, { t: 0 }, { t: 1, duration: .7, delay: delay + k * .022, ease: 'power2.inOut', onUpdate: () => setEdgeProg(e, e.prog.t), overwrite: true });
+  });
+}
+function hideEdges() { edgesShown = false; edges.forEach(e => { gsap.killTweensOf(e.prog); gsap.to(e.g, { opacity: 0, duration: .3, overwrite: true, onComplete: () => setEdgeProg(e, 0) }); gsap.to(e.lab, { opacity: 0, duration: .3, overwrite: true }); }); }
+
+/* hover */
+const tip = $('#tip');
+function nodeScreen(n) { const s = 1600 / cam.w; return { x: (n.x - cam.x) * s, y: (n.y - cam.y) * s, s }; }
+function hoverNode(n) {
+  if (!(graphState.mode === 'overview' || graphState.mode === 'focus') || !edgesShown) return;
+  const nb = new Set([n.id]); const inc = new Set();
+  edges.forEach(e => { if (e.s === n.id || e.t === n.id) { nb.add(e.s); nb.add(e.t); inc.add(e.i); } });
+  emphasize({ nodeOp: m => nb.has(m.id) ? 1 : .1, edgeOp: e => inc.has(e.i) ? 1 : .03, labelOp: e => inc.has(e.i) ? 1 : 0, hot: inc, dur: .3 });
+  const p = nodeScreen(n);
+  tip.style.setProperty('--c', STAGE_COLOR(n.stage)); tip.querySelector('b').textContent = n.label; tip.querySelector('span').textContent = n.desc;
+  let tx = p.x + (n.w / 2) * p.s + 18, ty = p.y - 30; if (tx + 290 > 1590) tx = p.x - (n.w / 2) * p.s - 298; ty = Math.min(ty, 780);
+  gsap.set(tip, { left: tx, top: ty }); gsap.to(tip, { opacity: 1, y: 0, duration: .25, overwrite: true });
+}
+function unhover() { if (!(graphState.mode === 'overview' || graphState.mode === 'focus')) return; gsap.to(tip, { opacity: 0, duration: .2, overwrite: true }); baseEmphasis(.35); }
+
+/* ---------------- background rings (morph) ---------------- */
+function ringPath(R, amp, k, ph = 0, k2 = 0, amp2 = 0, N = 220) {
+  let d = '';
+  for (let i = 0; i <= N; i++) { const a = i / N * Math.PI * 2; const r = R + amp * Math.sin(k * a + ph) + amp2 * Math.sin(k2 * a + ph * 2); d += (i ? 'L' : 'M') + (Math.cos(a) * r).toFixed(1) + ',' + (Math.sin(a) * r).toFixed(1); }
+  return d + 'Z';
+}
+const BLOB = {
+  hero:   { x: 1190, y: 440, s: 1, o: 1, sh: [[300, 16, 9, 0, 3, 10], [250, 22, 6, 1, 0, 0], [200, 12, 14, 2, 0, 0]] },
+  que:    { x: 1500, y: 110, s: .38, o: .45, sh: [[300, 6, 5, 0, 0, 0], [250, 10, 3, 1, 0, 0], [200, 6, 7, 2, 0, 0]] },
+  rels:   { x: 1500, y: 120, s: .4, o: .45, sh: [[300, 30, 12, 0, 0, 0], [250, 14, 4, 1, 0, 0], [200, 10, 9, 2, 0, 0]] },
+  graph:  { x: 800, y: 470, s: 1.9, o: .08, sh: [[300, 4, 3, 0, 0, 0], [250, 4, 4, 1, 0, 0], [200, 4, 5, 2, 0, 0]] },
+  lab:    { x: 370, y: 700, s: .9, o: .14, sh: [[300, 26, 7, 0, 2, 12], [250, 14, 11, 1, 0, 0], [200, 18, 5, 2, 0, 0]] },
+  cierre: { x: 1450, y: 800, s: .5, o: .3, sh: [[300, 10, 4, 0, 0, 0], [250, 18, 7, 1, 0, 0], [200, 8, 10, 2, 0, 0]] },
+  fin:    { x: 800, y: 430, s: 1.35, o: .55, sh: [[300, 0, 1, 0, 0, 0], [250, 0, 1, 0, 0, 0], [200, 0, 1, 0, 0, 0]] },
+};
+const rings = ['#ring1', '#ring2', '#ring3'].map(s => $(s));
+function blobTo(key, first) {
+  const b = BLOB[key];
+  gsap.to('#blob', { x: b.x, y: b.y, scale: b.s, opacity: b.o, duration: first ? 0 : 1.6, ease: 'expo.inOut', overwrite: 'auto' });
+  rings.forEach((r, i) => {
+    const d = ringPath(...b.sh[i]);
+    if (first) r.setAttribute('d', d); else gsap.to(r, { morphSVG: { shape: d, type: 'linear' }, duration: 1.6, ease: 'expo.inOut', overwrite: 'auto' });
+  });
+}
+gsap.to('#ring1', { rotation: 360, svgOrigin: '0 0', duration: 90, repeat: -1, ease: 'none' });
+gsap.to('#ring2', { rotation: -360, svgOrigin: '0 0', duration: 120, repeat: -1, ease: 'none' });
+gsap.to('#ring3', { rotation: 360, svgOrigin: '0 0', duration: 70, repeat: -1, ease: 'none' });
+
+/* boil: step the turbulence seed a few times per second, like hand-drawn animation */
+if (!REDUCED) { const T = $('#boilT'); let k = 0; setInterval(() => T.setAttribute('seed', (k++ % 5) + 1), 110); }
+
+/* ---------------- audio ---------------- */
+let AC, MASTER, AN, NOISE;
+function audio() {
+  if (!AC) {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    MASTER = AC.createGain(); MASTER.gain.value = .55;
+    const safe = AC.createDynamicsCompressor(); safe.threshold.value = -3; safe.ratio.value = 20; safe.attack.value = .002; safe.release.value = .12;
+    AN = AC.createAnalyser(); AN.fftSize = 2048;
+    MASTER.connect(safe); safe.connect(AN); AN.connect(AC.destination);
+    NOISE = AC.createBuffer(1, AC.sampleRate * 1, AC.sampleRate); const d = NOISE.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+let current = null;
+function stopAll() { if (current) { current.stop(); current = null; } $$('.play:not(.ghost)').forEach(b => { b.classList.remove('on'); b.querySelector('.t').textContent = 'Escuchar'; }); $$('#waveTabs .chip').forEach(c => c.classList.remove('on')); $$('.chord').forEach(c => c.classList.remove('on')); }
+function bus(level = 1) { const g = AC.createGain(); g.gain.value = 0; g.gain.setTargetAtTime(level, AC.currentTime, .02); g.connect(MASTER); return g; }
+function endBus(g, extra) { g.gain.setTargetAtTime(0, AC.currentTime, .04); setTimeout(() => { try { g.disconnect(); } catch (e) { } extra && extra(); }, 400); }
+function seq(stepDur, fn) { let next = AC.currentTime + .08, i = 0; const tick = () => { while (next < AC.currentTime + .15) { fn(i, next); next += stepDur; i++; } }; tick(); const id = setInterval(tick, 25); return () => clearInterval(id); }
+function env(g, t, a, peak, dur) { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(.0001, t + dur); }
+function kick(out, t, v = 1) { const o = AC.createOscillator(), g = AC.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t + .14); env(g, t, .003, .9 * v, .38); o.connect(g); g.connect(out); o.start(t); o.stop(t + .4); }
+function noiseHit(out, t, hp, v, dur) { const s = AC.createBufferSource(); s.buffer = NOISE; const f = AC.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hp; const g = AC.createGain(); env(g, t, .002, v, dur); s.connect(f); f.connect(g); g.connect(out); s.start(t, Math.random() * .5); s.stop(t + dur + .05); }
+function snare(out, t) { noiseHit(out, t, 1400, .45, .2); const o = AC.createOscillator(), g = AC.createGain(); o.frequency.value = 190; env(g, t, .002, .25, .12); o.connect(g); g.connect(out); o.start(t); o.stop(t + .15); }
+function tone(out, t, type, f, v, dur, cutoff = 2400, a = .005) { const o = AC.createOscillator(); o.type = type; o.frequency.value = f; const lp = AC.createBiquadFilter(); lp.frequency.value = cutoff; const g = AC.createGain(); env(g, t, a, v, dur); o.connect(lp); lp.connect(g); g.connect(out); o.start(t); o.stop(t + dur + .05); }
+
+/* composición: I–V–vi–IV */
+function playChords() {
+  audio(); const out = bus(.9);
+  const CH = [[36, [60, 64, 67]], [31, [59, 62, 67]], [33, [60, 64, 69]], [29, [60, 65, 69]]];
+  const MEL = [76, 0, 76, 74, 72, 0, 72, 74, 74, 0, 74, 72, 71, 0, 67, 0, 72, 0, 72, 74, 76, 0, 79, 76, 77, 0, 76, 74, 72, 0, 0, 0];
+  const timers = [];
+  const stop = seq(.3, (i, t) => {
+    const s = i % 32;
+    if (s % 8 === 0) {
+      const [b, ch] = CH[s / 8];
+      ch.forEach(m => { tone(out, t, 'sawtooth', mtof(m) * 1.003, .035, 2.4, 1500, .06); tone(out, t, 'sawtooth', mtof(m) * .997, .035, 2.4, 1500, .06); });
+      tone(out, t, 'triangle', mtof(b), .32, 2.2, 600, .01);
+      const bar = s / 8; timers.push(setTimeout(() => $$('.chord').forEach((c, k) => c.classList.toggle('on', k === bar)), (t - AC.currentTime) * 1000));
+    }
+    if (MEL[s]) tone(out, t, 'square', mtof(MEL[s]), .07, .27, 2600);
+    if (s % 2 === 0) kick(out, t, .7);
+    if (s % 8 === 2 || s % 8 === 6) snare(out, t);
+    noiseHit(out, t + .15, 8000, .06, .04);
+  });
+  return { stop() { stop(); timers.forEach(clearTimeout); endBus(out); } };
+}
+
+/* diseño de sonido: laboratorio de ondas */
+const WAVES = {
+  seno:       { name: 'Seno', lbl: 'FORMA DE ONDA', cap: 'Una onda pura, sin armónicos. Es el punto de partida.', f: t => Math.sin(2 * Math.PI * 3 * t) },
+  am:         { name: 'AM', lbl: 'FORMA DE ONDA', cap: 'Otra onda mueve el volumen. Lento se oye como pulso; rápido, como un timbre nuevo.', f: t => Math.sin(2 * Math.PI * 9 * t) * (.55 + .45 * Math.sin(2 * Math.PI * 1.5 * t)) },
+  fm:         { name: 'FM', lbl: 'FORMA DE ONDA', cap: 'Otra onda mueve la frecuencia. El timbre se vuelve brillante y metálico.', f: t => Math.sin(2 * Math.PI * 3 * t + 3.2 * Math.sin(2 * Math.PI * 4.5 * t)) },
+  saturacion: { name: 'Saturación', lbl: 'FORMA DE ONDA', cap: 'La onda se aplana en las puntas y aparecen armónicos. Como es una distorsión, lo hereda.', f: t => Math.tanh(4 * Math.sin(2 * Math.PI * 3 * t)) / Math.tanh(4) },
+  peine:      { name: 'Filtro peine', lbl: 'RESPUESTA EN FRECUENCIA', cap: 'Una copia retrasada se suma a la señal y cancela frecuencias en forma de peine.', f: t => (Math.abs(Math.cos(Math.PI * 7 * t)) * 1.8 - .9) },
+};
+function wavePathD(f, N = 256) { let d = ''; for (let i = 0; i <= N; i++) { const t = i / N; d += (i ? 'L' : 'M') + (t * 512).toFixed(1) + ',' + (75 - f(t) * 58).toFixed(1); } return d; }
+function playWave(mode) {
+  audio(); const out = bus(.32); const t = AC.currentTime; const nodesA = [];
+  const osc = (type, f) => { const o = AC.createOscillator(); o.type = type; o.frequency.value = f; o.start(); nodesA.push(o); return o; };
+  if (mode === 'seno') { osc('sine', 220).connect(out); }
+  if (mode === 'am') {
+    const c = osc('sine', 220), amp = AC.createGain(); amp.gain.value = .5; const m = osc('sine', 3), mg = AC.createGain(); mg.gain.value = .5;
+    m.frequency.setValueAtTime(3, t); m.frequency.exponentialRampToValueAtTime(110, t + 6);
+    m.connect(mg); mg.connect(amp.gain); c.connect(amp); amp.connect(out);
+  }
+  if (mode === 'fm') {
+    const c = osc('sine', 220), m = osc('sine', 330), mg = AC.createGain(); mg.gain.setValueAtTime(0, t); mg.gain.linearRampToValueAtTime(700, t + 4);
+    m.connect(mg); mg.connect(c.frequency); c.connect(out);
+  }
+  if (mode === 'saturacion') {
+    const c = osc('sine', 110), pre = AC.createGain(); pre.gain.setValueAtTime(.3, t); pre.gain.linearRampToValueAtTime(8, t + 4);
+    const ws = AC.createWaveShaper(); const curve = new Float32Array(2048); for (let i = 0; i < 2048; i++) { const x = i / 1023.5 - 1; curve[i] = Math.tanh(3 * x); } ws.curve = curve; ws.oversample = '4x';
+    const post = AC.createGain(); post.gain.value = .55; c.connect(pre); pre.connect(ws); ws.connect(post); post.connect(out);
+  }
+  if (mode === 'peine') {
+    const c = osc('sawtooth', 110), lvl = AC.createGain(); lvl.gain.value = .35;
+    const dl = AC.createDelay(.05); dl.delayTime.value = .006; const fb = AC.createGain(); fb.gain.value = .78;
+    const lfo = osc('sine', .18), lg = AC.createGain(); lg.gain.value = .0045; lfo.connect(lg); lg.connect(dl.delayTime);
+    c.connect(lvl); lvl.connect(out); lvl.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(out);
+  }
+  return { stop() { endBus(out, () => nodesA.forEach(o => { try { o.stop(); } catch (e) { } })); } };
+}
+
+/* mezcla: paneo y fase */
+let mixMode = 'paneo', phaseInv = false;
+function playMix() {
+  audio(); const out = bus(.8);
+  if (mixMode === 'paneo') {
+    const pan = AC.createStereoPanner(); pan.connect(out);
+    const p = { v: -1 }; const tw = gsap.fromTo(p, { v: -1 }, { v: 1, duration: 2.2, ease: 'sine.inOut', yoyo: true, repeat: -1, onUpdate: () => { pan.pan.setTargetAtTime(p.v, AC.currentTime, .01); gsap.set('#panDot', { x: p.v * 238 }); } });
+    const stop = seq(.15, (i, t) => { noiseHit(pan, t, 7000, i % 2 ? .22 : .38, .05); if (i % 4 === 0) kick(out, t, .5); });
+    return { stop() { stop(); tw.kill(); gsap.to('#panDot', { x: 0, duration: .6 }); endBus(out); } };
+  } else {
+    const t = AC.currentTime + .05; const a = AC.createOscillator(), b = AC.createOscillator(); a.frequency.value = b.frequency.value = 160;
+    const ga = AC.createGain(), gb = AC.createGain(); ga.gain.value = .28; gb.gain.value = phaseInv ? -.28 : .28;
+    a.connect(ga); b.connect(gb); ga.connect(out); gb.connect(out); a.start(t); b.start(t);
+    const api = { stop() { endBus(out, () => { a.stop(); b.stop(); }); }, set(inv) { gb.gain.setTargetAtTime(inv ? -.28 : .28, AC.currentTime, .05); } };
+    return api;
+  }
+}
+function drawPhase(animate) {
+  const A = t => Math.sin(2 * Math.PI * 3 * t), B = t => (phaseInv ? -1 : 1) * Math.sin(2 * Math.PI * 3 * t);
+  const pA = wavePathD(t => A(t) * .45 + .0), pB = wavePathD(t => B(t) * .45), pS = wavePathD(t => (A(t) + B(t)) * .5);
+  const set = (id, d) => animate ? gsap.to(id, { morphSVG: d, duration: .9, ease: 'expo.inOut' }) : $(id).setAttribute('d', d);
+  set('#phA', pA); set('#phB', pB); set('#phS', pS);
+}
+
+/* master: limitador */
+let limOn = false, masterNodes = null;
+const BARS = 48; const barsBox = $('#bars'); for (let i = 0; i < BARS; i++) barsBox.appendChild(document.createElement('i'));
+const PATTERN = [1, .2, .3, .15, .8, .2, .35, .15, .9, .25, .7, .2, .85, .2, .4, .3];
+function drawBars(on, dur = 1) {
+  $$('#bars i').forEach((b, i) => { const h = PATTERN[i % 16] * (.85 + .15 * Math.sin(i)); const v = on ? Math.min(.96, .66 + .3 * Math.sqrt(h)) : h; gsap.to(b, { scaleY: v * .95 + .04, duration: dur, ease: 'expo.inOut', delay: i * .008 }); });
+}
+function playMaster() {
+  audio(); const out = bus(1);
+  const src = AC.createGain(); const dry = AC.createGain(), wet = AC.createGain();
+  const comp = AC.createDynamicsCompressor(); comp.threshold.value = -26; comp.ratio.value = 20; comp.knee.value = 2; comp.attack.value = .001; comp.release.value = .09;
+  const makeup = AC.createGain(); makeup.gain.value = 7;
+  dry.gain.value = limOn ? 0 : 1; wet.gain.value = limOn ? 1 : 0;
+  src.connect(dry); dry.connect(out); src.connect(comp); comp.connect(makeup); makeup.connect(wet); wet.connect(out);
+  const BASS = [36, 0, 0, 36, 0, 0, 39, 0, 41, 0, 0, 41, 0, 0, 39, 0];
+  const stop = seq(.15, (i, t) => { const s = i % 16; if ([0, 6, 8, 10].includes(s)) kick(src, t, 1); if (s === 4 || s === 12) snare(src, t); noiseHit(src, t, 8000, s % 2 ? .05 : .1, .04); if (BASS[s]) tone(src, t, 'sawtooth', mtof(BASS[s]), .18, .28, 500); });
+  masterNodes = { dry, wet };
+  return { stop() { stop(); masterNodes = null; endBus(out); } };
+}
+
+/* scope + meter (live from the analyser) */
+const scope = $('#scope'), sctx = scope.getContext('2d'); let buf = new Float32Array(2048);
+function drawScope(ts) {
+  sctx.clearRect(0, 0, 1600, 900);
+  const y0 = 872; sctx.lineWidth = 1.5; sctx.strokeStyle = 'rgba(238,231,219,.5)'; sctx.beginPath();
+  let live = false, rms = 0;
+  if (AN && current) { AN.getFloatTimeDomainData(buf); live = true; for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i]; rms = Math.sqrt(rms / buf.length); }
+  for (let x = 0; x <= 1600; x += 4) {
+    let v;
+    if (live) v = buf[Math.floor(x / 1600 * 1023)] * 70;
+    else { const t = ts / 1000; v = Math.sin(x * .012 + t * 1.3) * 3 + Math.sin(x * .031 - t * 2.1) * 1.6; }
+    x ? sctx.lineTo(x, y0 + v) : sctx.moveTo(x, y0 + v);
+  }
+  sctx.stroke();
+  if (curSlideId() === 'master') { const db = rms > 0 ? 20 * Math.log10(rms) : -60; const pct = Math.max(0, Math.min(1, (db + 42) / 40)); $('#meterI').style.width = (pct * 100).toFixed(1) + '%'; $('#meterT').textContent = current ? db.toFixed(0) + ' dB' : '— dB'; }
+  requestAnimationFrame(drawScope);
+}
+requestAnimationFrame(drawScope);
+
+/* ---------------- slides engine ---------------- */
+const slides = $$('.slide');
+let cur = -1, step = 0;
+const curSlideId = () => slides[cur] && slides[cur].dataset.id;
+const SLIDE_COLOR = { comp: 'var(--comp)', diseno: 'var(--diseno)', mezcla: 'var(--mezcla)', master: 'var(--master)', paso1: 'var(--comp)', paso2: 'var(--diseno)', paso3: 'var(--mezcla)', infer: 'var(--master)' };
+const prog = $('#prog');
+slides.forEach((s, i) => { const sp = document.createElement('span'); sp.style.setProperty('--c', SLIDE_COLOR[s.dataset.id] || 'var(--ink)'); sp.title = s.dataset.label; sp.onclick = () => go(i); prog.appendChild(sp); });
+
+function itemsOf(s) { return $$('[data-a]', s); }
+function visibleAt(el, k) { const a = +(el.dataset.step || 0), b = el.dataset.until != null ? +el.dataset.until : 99; return k >= a && k <= b; }
+function splitOf(el) { if (!el._split) el._split = SplitText.create(el, { type: 'lines', mask: 'lines', linesClass: 'split-line' }); return el._split; }
+
+function animateIn(s, k) {
+  gsap.set(s, { autoAlpha: 1 }); s.classList.add('on');
+  $$('.split', s).forEach((el, i) => { const sp = splitOf(el); gsap.set(el, { autoAlpha: 1 }); gsap.fromTo(sp.lines, { yPercent: 118, rotate: 1.5 }, { yPercent: 0, rotate: 0, duration: 1.15, ease: 'expo.out', stagger: .09, delay: .32 + i * .1, overwrite: true }); });
+  const show = itemsOf(s).filter(el => visibleAt(el, k)), hide = itemsOf(s).filter(el => !visibleAt(el, k));
+  gsap.set(hide, { autoAlpha: 0 });
+  gsap.fromTo(show, { autoAlpha: 0, y: 26, filter: 'blur(8px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: .95, ease: 'expo.out', stagger: .07, delay: .5, overwrite: true, clearProps: 'filter' });
+}
+function animateOut(s) {
+  s.classList.remove('on');
+  const els = [...itemsOf(s), ...$$('.split', s).flatMap(el => el._split ? el._split.lines : [])];
+  gsap.to(itemsOf(s), { autoAlpha: 0, y: -14, duration: .35, ease: 'power2.in', overwrite: true });
+  $$('.split', s).forEach(el => el._split && gsap.to(el._split.lines, { yPercent: -118, duration: .4, ease: 'power2.in', overwrite: true }));
+  gsap.to(s, { autoAlpha: 0, duration: .01, delay: .42 });
+}
+function stepTo(k) {
+  const s = slides[cur]; const prevK = step; step = k;
+  itemsOf(s).forEach(el => {
+    const was = visibleAt(el, prevK), is = visibleAt(el, k);
+    if (is && !was) gsap.fromTo(el, { autoAlpha: 0, y: 18, filter: 'blur(6px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: .8, ease: 'expo.out', delay: .15, overwrite: true, clearProps: 'filter' });
+    if (!is && was) gsap.to(el, { autoAlpha: 0, y: -10, duration: .3, overwrite: true });
+  });
+  HOOK[s.dataset.id]?.step?.(k, prevK);
+  updateUI();
+}
+function go(i, dir = 1, atEnd = false) {
+  if (i < 0 || i >= slides.length || i === cur) return;
+  stopAll();
+  const prevS = slides[cur]; if (prevS) { animateOut(prevS); HOOK[prevS.dataset.id]?.leave?.(); }
+  const first = cur === -1; cur = i; const s = slides[i];
+  step = atEnd ? +(s.dataset.steps || 0) : 0;
+  if (!first && !REDUCED) gsap.fromTo('#playhead', { x: dir > 0 ? -30 : 1630, opacity: 1 }, { x: dir > 0 ? 1630 : -30, duration: 1.05, ease: 'power2.inOut', onComplete: () => gsap.set('#playhead', { opacity: 0 }) });
+  animateIn(s, step);
+  const id = s.dataset.id;
+  blobTo(({ hero: 'hero', que: 'que', rels: 'rels', paso2: 'rels', comp: 'lab', diseno: 'lab', mezcla: 'lab', master: 'lab', cierre: 'cierre', fin: 'fin' })[id] || 'graph', first);
+  HOOK[id]?.enter?.(step, dir);
+  if (!HOOK[id]?.graph) applyGraph({ visible: false, mode: 'none' });
+  history.replaceState(null, '', '#' + (i + 1));
+  updateUI();
+}
+function next() { const s = slides[cur]; const n = +(s.dataset.steps || 0); if (step < n) stepTo(step + 1); else go(cur + 1, 1); }
+function prev() { if (step > 0) stepTo(step - 1); else go(cur - 1, -1, true); }
+function updateUI() {
+  $$('#prog span').forEach((sp, i) => sp.classList.toggle('done', i <= cur));
+  const s = slides[cur]; $('#count').innerHTML = `${String(cur + 1).padStart(2, '0')} / ${slides.length}<span class="lbl"> · ${s.dataset.label}</span>`;
+  $('#notesT').textContent = s.dataset.notes || '';
+}
+
+/* ---------------- per-slide hooks ---------------- */
+const HOOK = {};
+HOOK.paso1 = {
+  graph: true,
+  enter(k) { applyGraph({ visible: true, layout: k ? 'grid' : 'scatter', edges: false, cam: 'full', mode: 'none' }); },
+  step(k) { applyGraph({ layout: k ? 'grid' : 'scatter' }); },
+};
+HOOK.paso3 = { graph: true, enter() { applyGraph({ visible: true, layout: 'net', edges: true, cam: 'overview', mode: 'overview' }); } };
+for (const st of ['comp', 'diseno', 'mezcla', 'master']) HOOK[st] = { graph: true, enter() { applyGraph({ visible: true, layout: 'net', edges: true, cam: st, mode: 'focus', focus: st }); } };
+HOOK.infer = {
+  graph: true,
+  enter(k) { inferSel = null; applyGraph({ visible: true, layout: 'net', edges: true, cam: 'infer', mode: 'infer' }); if (k) setTimeout(() => ask(k - 1), 1300); else resetAnswer(); },
+  step(k) { k ? ask(k - 1) : (resetAnswer(), inferSel = null, nodes.forEach(n => gsap.to(n.el, { scale: 1, duration: .4 })), camTo('infer', 1.3), baseEmphasis(.5)); },
+  leave() { inferSel = null; nodes.forEach(n => gsap.to(n.el, { scale: 1, duration: .4 })); },
+};
+HOOK.que = { enter(k) { miniStep(k, true); }, step(k) { miniStep(k); } };
+HOOK.paso2 = { enter() { animateTriples(); } };
+HOOK.diseno.enter = (orig => function () { orig(); setWave('seno', false); })(HOOK.diseno.enter);
+HOOK.mezcla.enter = (orig => function () { orig(); setMix(mixMode); })(HOOK.mezcla.enter);
+HOOK.master.enter = (orig => function () { orig(); gsap.set('#bars i', { scaleY: .04 }); gsap.delayedCall(.7, () => drawBars(limOn, 1.2)); })(HOOK.master.enter);
+
+/* slide 1: mini network */
+const MINI = { n: [['Reverb', 150, 150, 'diseno', false], ['Efecto de tiempo', 600, 150, 'diseno', false], ['Diseño de sonido', 390, 470, 'diseno', true]] };
+let miniParts;
+function buildMini() {
+  const sv = $('#mini'); const g = svgEl('g', { filter: 'url(#boil)' }, sv); const gn = svgEl('g', {}, sv);
+  const ns = MINI.n.map(([l, x, y, st, hub]) => {
+    const ng = svgEl('g', { class: 'node' + (hub ? ' hub' : '') }, gn); ng.style.setProperty('--c', STAGE_COLOR(st));
+    const r = svgEl('rect', {}, ng); const t = svgEl('text', {}, ng); t.textContent = l; t.style.fontSize = hub ? '21px' : '19px';
+    const w = t.getComputedTextLength() + 52, h = 54; r.setAttribute('x', -w / 2); r.setAttribute('y', -h / 2); r.setAttribute('width', w); r.setAttribute('height', h); r.setAttribute('rx', 27);
+    gsap.set(ng, { x, y }); return { g: ng, x, y, w, h };
+  });
+  const mk = (a, b, type, label, dashed) => {
+    const ang = Math.atan2(b.y - a.y, b.x - a.x); const off = (n, sgn) => { const dx = Math.cos(ang), dy = Math.sin(ang); const t = Math.min((n.w / 2) / Math.abs(dx || 1e-6), (n.h / 2 + 2) / Math.abs(dy || 1e-6)) + 8; return [n.x + sgn * dx * t, n.y + sgn * dy * t]; };
+    const [x1, y1] = off(a, 1), [x2, y2] = off(b, -1); const r = REL[type];
+    const eg = svgEl('g', { class: 'edge ' + type }, g);
+    const ex = x2 - Math.cos(ang) * r.back, ey = y2 - Math.sin(ang) * r.back;
+    const line = svgEl('line', { x1, y1, x2: x1, y2: y1, 'stroke-width': r.w + .6, 'stroke-dasharray': dashed ? '3 7' : r.dash, 'stroke-linecap': 'round' }, eg);
+    const head = svgEl('path', { d: HEAD[r.head], transform: `translate(${x2},${y2}) rotate(${ang * 180 / Math.PI}) scale(1.3)`, 'stroke-width': 1.5, opacity: 0 }, eg);
+    if (dashed) { line.style.stroke = 'var(--comp)'; head.style.stroke = 'var(--comp)'; head.style.fill = 'var(--comp)'; }
+    const lab = svgEl('text', { class: 'lab2', x: (x1 + x2) / 2 + (dashed ? -22 : type === 'es_un' ? 0 : 22), y: (y1 + y2) / 2 + (type === 'es_un' ? -24 : 0), 'text-anchor': dashed ? 'end' : type === 'es_un' ? 'middle' : 'start', opacity: 0 }, sv); lab.textContent = label;
+    if (dashed) lab.style.fill = 'var(--comp)';
+    return { line, head, lab, x1, y1, ex, ey, p: { t: 0 } };
+  };
+  miniParts = { ns, es: [mk(ns[0], ns[1], 'es_un', 'es un'), mk(ns[1], ns[2], 'parte_de', 'parte de')], inf: mk(ns[0], ns[2], 'parte_de', 'parte de (deducido)', true) };
+}
+function miniEdge(e, on, d = 0) { gsap.to(e.p, { t: on ? 1 : 0, duration: on ? .9 : .3, delay: d, ease: 'power2.inOut', overwrite: true, onUpdate: () => { e.line.setAttribute('x2', e.x1 + (e.ex - e.x1) * e.p.t); e.line.setAttribute('y2', e.y1 + (e.ey - e.y1) * e.p.t); e.head.setAttribute('opacity', e.p.t > .97 ? 1 : 0); } }); gsap.to(e.lab, { opacity: on ? 1 : 0, duration: .5, delay: on ? d + .6 : 0, overwrite: true }); }
+function miniStep(k, entering) {
+  const { ns, es, inf } = miniParts;
+  if (entering) gsap.fromTo(ns.map(n => n.g), { scale: .4, opacity: 0, transformOrigin: '50% 50%' }, { scale: 1, opacity: 1, duration: .9, ease: 'back.out(1.7)', stagger: .12, delay: .5 });
+  es.forEach((e, i) => miniEdge(e, k >= 1, (entering ? .9 : 0) + i * .5));
+  miniEdge(inf, k >= 2, entering ? 2 : .1);
+}
+
+/* slide 2: legend rows */
+(function buildRels() {
+  const grid = $('#relsGrid');
+  for (const k of Object.keys(REL)) {
+    const r = REL[k];
+    grid.insertAdjacentHTML('beforeend', `<div class="rel-row"><div data-a>${relSample(k, 170)}</div><div class="rel-name" data-a>${r.name}</div><div class="rel-desc" data-a>${r.desc}</div><div class="rel-ex" data-a>“${r.ex}”</div></div>`);
+  }
+})();
+
+/* slide 4: triples */
+const TRIPLES = [['saturacion', 'distorsion'], ['melodia', 'composicion'], ['dinamica', 'automatizacion'], ['distorsion', 'armonicos'], ['eq', 'filtro'], ['fase', 'peine'], ['limitador', 'compresion'], ['mezcla', 'master']];
+(function buildTriples() {
+  const box = $('#triples');
+  TRIPLES.forEach(([s, t]) => {
+    const e = edges.find(e => e.s === s && e.t === t); const a = byId[s], b = byId[t];
+    box.insertAdjacentHTML('beforeend', `<div class="triple"><span class="pill" style="--c:${STAGE_COLOR(a.stage)}">${a.label}</span><div class="rel">${relSample(e.type, 220)}<span>${e.label}</span></div><span class="pill" style="--c:${STAGE_COLOR(b.stage)}">${b.label}</span></div>`);
+  });
+})();
+function animateTriples() {
+  $$('#triples .triple').forEach((row, i) => {
+    const [a, rel, b] = row.children; const d = .55 + i * .13;
+    gsap.fromTo(a, { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: .8, ease: 'expo.out', delay: d, overwrite: true });
+    gsap.fromTo(rel.querySelector('svg'), { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: .7, ease: 'power2.inOut', delay: d + .15, overwrite: true });
+    gsap.fromTo(rel.querySelector('span'), { autoAlpha: 0 }, { autoAlpha: 1, duration: .5, delay: d + .45, overwrite: true });
+    gsap.fromTo(b, { autoAlpha: 0, scale: .8 }, { autoAlpha: 1, scale: 1, duration: .7, ease: 'back.out(2)', delay: d + .6, overwrite: true });
+  });
+}
+
+/* slide 5: filters */
+(function buildFilters() {
+  const box = $('#filters');
+  const mk = (label, type) => { const b = document.createElement('button'); b.className = 'chip' + (type ? '' : ' on'); b.innerHTML = (type ? relSample(type, 34) : '') + label; b.onclick = () => { relFilter = type; $$('.chip', box).forEach(c => c.classList.toggle('on', c === b)); baseEmphasis(.4); }; box.appendChild(b); };
+  mk('Todas', null); Object.keys(REL).forEach(k => mk(REL[k].name, k));
+})();
+
+/* diseño: tabs */
+let waveMode = 'seno';
+(function buildWaveTabs() {
+  const box = $('#waveTabs');
+  Object.keys(WAVES).forEach(k => { const b = document.createElement('button'); b.className = 'chip'; b.dataset.w = k; b.innerHTML = WAVES[k].name; b.onclick = () => { const was = current && waveMode === k; stopAll(); setWave(k, true); if (!was) { current = playWave(k); b.classList.add('on'); } }; box.appendChild(b); });
+  $('#wavePath').setAttribute('d', wavePathD(WAVES.seno.f));
+})();
+function setWave(k, animate) {
+  waveMode = k; const w = WAVES[k];
+  if (animate) gsap.to('#wavePath', { morphSVG: { shape: wavePathD(w.f), type: 'linear' }, duration: .9, ease: 'expo.inOut', overwrite: true }); else $('#wavePath').setAttribute('d', wavePathD(w.f));
+  $('#waveLbl').textContent = w.lbl;
+  const cap = $('#waveCap'); gsap.to(cap, { opacity: 0, duration: .15, onComplete: () => { cap.textContent = w.cap + (animate ? '' : ' Toca un botón para escucharlo.'); gsap.to(cap, { opacity: 1, duration: .35 }); } });
+}
+
+/* mezcla: tabs */
+const MIXCAP = { paneo: 'El hi-hat viaja de izquierda a derecha mientras el bombo se queda al centro. Mejor con audífonos.', fase: 'Dos ondas idénticas se suman. Si inviertes la fase de una, se cancelan: silencio.' };
+function setMix(m) {
+  mixMode = m; $$('#mixTabs .chip').forEach(c => c.classList.toggle('on', c.dataset.m === m));
+  $('#stereoBox').style.display = m === 'paneo' ? '' : 'none'; $('#phaseBox').style.display = m === 'fase' ? '' : 'none';
+  $('#mixCap').textContent = MIXCAP[m]; phaseInv = false; drawPhase(false); updatePhaseBtn();
+  $('#phaseBtn').style.display = m === 'fase' ? '' : 'none';
+}
+function updatePhaseBtn() { const b = $('#phaseBtn'); b.classList.toggle('on', phaseInv); b.querySelector('.t').textContent = phaseInv ? 'Restaurar fase' : 'Invertir fase'; }
+$('#phaseBtn').onclick = () => { phaseInv = !phaseInv; if (current && current.set) current.set(phaseInv); drawPhase(true); updatePhaseBtn(); };
+$$('#mixTabs .chip').forEach(c => c.onclick = () => { stopAll(); setMix(c.dataset.m); });
+$('#playMix').onclick = () => {
+  const b = $('#playMix');
+  if (current) { stopAll(); return; }
+  current = playMix(); b.classList.add('on'); b.querySelector('.t').textContent = 'Detener';
+};
+/* composición */
+$('#playChords').onclick = () => { const b = $('#playChords'); if (current) { stopAll(); return; } current = playChords(); b.classList.add('on'); b.querySelector('.t').textContent = 'Detener'; };
+/* master */
+$('#playMaster').onclick = () => { const b = $('#playMaster'); if (current) { stopAll(); return; } current = playMaster(); b.classList.add('on'); b.querySelector('.t').textContent = 'Detener'; };
+$('#limBtn').onclick = () => {
+  limOn = !limOn; const b = $('#limBtn'); b.classList.toggle('on', limOn); b.querySelector('.t').textContent = 'Limitador: ' + (limOn ? 'encendido' : 'apagado');
+  drawBars(limOn, .9);
+  if (masterNodes) { masterNodes.dry.gain.setTargetAtTime(limOn ? 0 : 1, AC.currentTime, .03); masterNodes.wet.gain.setTargetAtTime(limOn ? 1 : 0, AC.currentTime, .03); }
+};
+
+/* inferencia */
+const QUESTIONS = [
+  { q: '¿El limitador cambia la dinámica?', path: ['limitador', 'compresion', 'rango'], a: ['Sí.', 'El limitador es un tipo de compresión, y la compresión controla el rango dinámico. Lo hereda.'] },
+  { q: '¿La saturación cambia el timbre?', path: ['saturacion', 'distorsion', 'armonicos', 'timbre'], a: ['Sí.', 'Es una distorsión, la distorsión genera armónicos y los armónicos definen el timbre.'] },
+  { q: '¿Ecualizar cambia el timbre?', path: ['eq', 'filtro', 'timbre'], a: ['Sí.', 'La ecualización es un filtro, y los filtros modifican el timbre.'] },
+  { q: '¿Por qué una mala fase suena rara?', path: ['fase', 'peine', 'filtro', 'timbre'], a: ['Por herencia.', 'La fase mal cuidada provoca un filtro peine, y como todo filtro, modifica el timbre.'] },
+  { q: '¿El master arregla una mala canción?', path: null, a: ['No.', 'Desde la masterización ninguna flecha llega a la melodía, la armonía o la letra. Lo que no está en la canción, el master no lo agrega.'] },
+];
+(function buildQ() {
+  const box = $('#qlist');
+  QUESTIONS.forEach((q, i) => { const b = document.createElement('button'); b.className = 'q'; b.innerHTML = `<small>PREGUNTA ${i + 1}</small>${q.q}`; b.onclick = () => { step = i + 1; ask(i); updateUI(); }; box.appendChild(b); });
+})();
+function resetAnswer() { $$('.q').forEach(b => b.classList.remove('on')); $('#chain').innerHTML = ''; $('#ansTxt').innerHTML = '<span class="muted">Elige una pregunta, o avanza para recorrerlas.</span>'; }
+function edgeBetween(a, b) { return edges.find(e => e.s === a && e.t === b); }
+function ask(i) {
+  const Q = QUESTIONS[i]; inferSel = i;
+  $$('.q').forEach((b, k) => b.classList.toggle('on', k === i));
+  const chain = $('#chain'); chain.innerHTML = '';
+  const pill = id => `<span class="pill" style="--c:${STAGE_COLOR(byId[id].stage)}">${byId[id].label}</span>`;
+  let lit = new Set(), es = new Set();
+  if (Q.path) {
+    Q.path.forEach((id, k) => { lit.add(id); if (k) { const e = edgeBetween(Q.path[k - 1], id); es.add(e.i); chain.insertAdjacentHTML('beforeend', `<span class="arr">${e.label}</span>`); } chain.insertAdjacentHTML('beforeend', pill(id)); });
+  } else {
+    const seen = new Set(['master']), qq = ['master']; while (qq.length) { const c = qq.shift(); edges.forEach(e => { if (e.s === c) { es.add(e.i); if (!seen.has(e.t)) { seen.add(e.t); qq.push(e.t); } } }); }
+    lit = seen;
+    chain.insertAdjacentHTML('beforeend', pill('master') + `<span class="arr no">sin camino</span>` + pill('melodia') + `<span class="muted" style="font:400 14px var(--mono);margin-left:6px">· llega a ${seen.size - 1} conceptos, ninguno de composición</span>`);
+  }
+  gsap.fromTo(chain.children, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, stagger: .12, duration: .5, ease: 'expo.out' });
+  const at = $('#ansTxt'); at.innerHTML = `<b>${Q.a[0]}</b>${Q.a[1]}`; gsap.fromTo(at, { autoAlpha: 0 }, { autoAlpha: 1, duration: .6, delay: .3 });
+  const path = !!Q.path;
+  emphasize({ nodeOp: n => lit.has(n.id) ? 1 : (!path && n.stage === 'comp') ? .05 : path ? .08 : .12, edgeOp: e => es.has(e.i) ? 1 : .03, labelOp: e => path && es.has(e.i) ? 1 : 0, hot: es, trail: path ? es : new Set(), dur: .5 });
+  nodes.forEach(n => gsap.to(n.el, { scale: path && lit.has(n.id) ? 1.08 : 1, duration: .6, ease: 'back.out(2)' }));
+  if (path) { const B = bbox(Q.path.map(id => byId[id])); B.x -= 70; B.y -= 60; B.w += 140; B.h += 120; camTo(fitCam(B, { x: 480, y: 50, w: 1060, h: 630 }, 1.75), 1.3); }
+  else camTo('infer', 1.3);
+}
+
+/* ---------------- input ---------------- */
+addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); next(); }
+  else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); prev(); }
+  else if (k === 'Home') go(0, -1); else if (k === 'End') go(slides.length - 1, 1);
+  else if (k === 'n' || k === 'N') $('#notes').classList.toggle('on');
+  else if (k === 'f' || k === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+  gsap.to('#hint', { opacity: 0, duration: .6, delay: .4 });
+});
+$('#nextB').onclick = next; $('#prevB').onclick = prev;
+let tx0 = null; addEventListener('touchstart', e => tx0 = e.touches[0].clientX, { passive: true });
+addEventListener('touchend', e => { if (tx0 == null) return; const dx = e.changedTouches[0].clientX - tx0; if (Math.abs(dx) > 50) dx < 0 ? next() : prev(); tx0 = null; });
+
+/* ---------------- boot ---------------- */
+document.fonts.ready.then(() => {
+  buildGraph(); buildMini();
+  nodes.forEach(n => { n.el.addEventListener('mouseenter', () => hoverNode(n)); n.el.addEventListener('mouseleave', unhover); });
+  gsap.set(G, { autoAlpha: 0 }); applyCam();
+  const start = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1)) || 1) - 1));
+  go(start, 1);
+});
+</script>
+</body>
+</html>

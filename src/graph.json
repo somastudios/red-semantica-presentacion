@@ -1,0 +1,608 @@
+{
+ "stages": {
+  "root": {
+   "name": "Producción",
+   "color": "#EEE7DB"
+  },
+  "comp": {
+   "name": "Composición",
+   "color": "#E9B44C"
+  },
+  "diseno": {
+   "name": "Diseño de sonido",
+   "color": "#F07155"
+  },
+  "mezcla": {
+   "name": "Mezcla",
+   "color": "#45C4B0"
+  },
+  "master": {
+   "name": "Masterización",
+   "color": "#A393F5"
+  },
+  "dist": {
+   "name": "Distribución",
+   "color": "#D9CFBF"
+  }
+ },
+ "nodes": [
+  {
+   "id": "produccion",
+   "label": "Producción musical",
+   "stage": "root",
+   "hub": true,
+   "desc": "Todo el proceso: de la idea a la canción publicada."
+  },
+  {
+   "id": "composicion",
+   "label": "Composición",
+   "stage": "comp",
+   "hub": true,
+   "desc": "Escribir la canción: qué notas, qué palabras, en qué orden."
+  },
+  {
+   "id": "melodia",
+   "label": "Melodía",
+   "stage": "comp",
+   "desc": "La secuencia de notas que cantas o tarareas."
+  },
+  {
+   "id": "gancho",
+   "label": "Gancho",
+   "stage": "comp",
+   "desc": "La frase corta que se te queda pegada. Casi siempre vive en el coro."
+  },
+  {
+   "id": "armonia",
+   "label": "Armonía",
+   "stage": "comp",
+   "desc": "Las notas que suenan juntas debajo de la melodía."
+  },
+  {
+   "id": "progresion",
+   "label": "Progresión",
+   "stage": "comp",
+   "desc": "El orden en que cambian los acordes. I–V–vi–IV es la más usada en el pop."
+  },
+  {
+   "id": "ritmo",
+   "label": "Ritmo",
+   "stage": "comp",
+   "desc": "Cuándo pasa cada cosa. El pulso de la canción."
+  },
+  {
+   "id": "letra",
+   "label": "Letra",
+   "stage": "comp",
+   "desc": "Lo que dice la canción."
+  },
+  {
+   "id": "estructura",
+   "label": "Estructura",
+   "stage": "comp",
+   "desc": "El orden de las secciones: intro, verso, coro, puente."
+  },
+  {
+   "id": "coro",
+   "label": "Coro",
+   "stage": "comp",
+   "desc": "La sección que se repite y que todos cantan."
+  },
+  {
+   "id": "diseno",
+   "label": "Diseño de sonido",
+   "stage": "diseno",
+   "hub": true,
+   "desc": "Decidir cómo suena cada instrumento."
+  },
+  {
+   "id": "sintesis",
+   "label": "Síntesis",
+   "stage": "diseno",
+   "desc": "Crear un sonido desde cero con osciladores."
+  },
+  {
+   "id": "fm",
+   "label": "FM",
+   "stage": "diseno",
+   "desc": "Un oscilador modula la frecuencia de otro. Sonidos metálicos y brillantes."
+  },
+  {
+   "id": "am",
+   "label": "AM",
+   "stage": "diseno",
+   "desc": "Un oscilador modula el volumen de otro. Trémolos y timbres nuevos."
+  },
+  {
+   "id": "filtro",
+   "label": "Filtro",
+   "stage": "diseno",
+   "desc": "Quita o resalta frecuencias de un sonido."
+  },
+  {
+   "id": "peine",
+   "label": "Filtro peine",
+   "stage": "diseno",
+   "desc": "Suma una copia retrasada de la señal. Crea muescas repetidas en el espectro."
+  },
+  {
+   "id": "distorsion",
+   "label": "Distorsión",
+   "stage": "diseno",
+   "desc": "Deforma la onda a propósito."
+  },
+  {
+   "id": "saturacion",
+   "label": "Saturación",
+   "stage": "diseno",
+   "desc": "Distorsión suave. Agrega calidez y presencia."
+  },
+  {
+   "id": "tiempo",
+   "label": "Efectos de tiempo",
+   "stage": "diseno",
+   "desc": "Efectos que trabajan con copias de la señal en el tiempo."
+  },
+  {
+   "id": "reverb",
+   "label": "Reverb",
+   "stage": "diseno",
+   "desc": "Simula las reflexiones de un espacio."
+  },
+  {
+   "id": "delay",
+   "label": "Delay",
+   "stage": "diseno",
+   "desc": "Repite la señal después de un tiempo. Eco."
+  },
+  {
+   "id": "armonicos",
+   "label": "Armónicos",
+   "stage": "diseno",
+   "desc": "Frecuencias extra sobre la nota base."
+  },
+  {
+   "id": "timbre",
+   "label": "Timbre",
+   "stage": "diseno",
+   "desc": "El color de un sonido. Lo que distingue un piano de una guitarra."
+  },
+  {
+   "id": "profundidad",
+   "label": "Profundidad",
+   "stage": "diseno",
+   "desc": "Qué tan cerca o lejos se siente un sonido."
+  },
+  {
+   "id": "mezcla",
+   "label": "Mezcla",
+   "stage": "mezcla",
+   "hub": true,
+   "desc": "Hacer que todos los sonidos quepan juntos."
+  },
+  {
+   "id": "estatica",
+   "label": "Mezcla estática",
+   "stage": "mezcla",
+   "desc": "El balance base: niveles y paneo que no cambian."
+  },
+  {
+   "id": "dinamica",
+   "label": "Mezcla dinámica",
+   "stage": "mezcla",
+   "desc": "La mezcla que se mueve durante la canción."
+  },
+  {
+   "id": "niveles",
+   "label": "Niveles",
+   "stage": "mezcla",
+   "desc": "El volumen de cada pista."
+  },
+  {
+   "id": "paneo",
+   "label": "Paneo",
+   "stage": "mezcla",
+   "desc": "Dónde suena cada instrumento, de izquierda a derecha."
+  },
+  {
+   "id": "automatizacion",
+   "label": "Automatización",
+   "stage": "mezcla",
+   "desc": "Cambios programados en el tiempo: subir, bajar, mover."
+  },
+  {
+   "id": "eq",
+   "label": "Ecualización",
+   "stage": "mezcla",
+   "desc": "Ajustar cuánto suena cada rango de frecuencias."
+  },
+  {
+   "id": "compresion",
+   "label": "Compresión",
+   "stage": "mezcla",
+   "desc": "Baja lo que suena muy fuerte para emparejar el volumen."
+  },
+  {
+   "id": "rango",
+   "label": "Rango dinámico",
+   "stage": "mezcla",
+   "desc": "La distancia entre lo más suave y lo más fuerte."
+  },
+  {
+   "id": "midside",
+   "label": "Mid-side",
+   "stage": "mezcla",
+   "desc": "Procesar por separado el centro y los lados del estéreo."
+  },
+  {
+   "id": "fase",
+   "label": "Fase",
+   "stage": "mezcla",
+   "desc": "La alineación en el tiempo de dos señales parecidas."
+  },
+  {
+   "id": "estereo",
+   "label": "Imagen estéreo",
+   "stage": "mezcla",
+   "desc": "Qué tan ancha y ordenada se siente la mezcla."
+  },
+  {
+   "id": "master",
+   "label": "Masterización",
+   "stage": "master",
+   "hub": true,
+   "desc": "El último ajuste sobre la mezcla terminada."
+  },
+  {
+   "id": "limitador",
+   "label": "Limitador",
+   "stage": "master",
+   "desc": "Un compresor extremo: nada pasa de cierto nivel."
+  },
+  {
+   "id": "loudness",
+   "label": "Loudness (LUFS)",
+   "stage": "master",
+   "desc": "Qué tan fuerte se percibe la canción."
+  },
+  {
+   "id": "distribucion",
+   "label": "Distribución",
+   "stage": "dist",
+   "hub": true,
+   "desc": "Publicar la canción en plataformas."
+  },
+  {
+   "id": "normalizacion",
+   "label": "Normalización",
+   "stage": "dist",
+   "desc": "La plataforma iguala el volumen de todas las canciones."
+  }
+ ],
+ "edges": [
+  [
+   "composicion",
+   "parte_de",
+   "parte de",
+   "produccion"
+  ],
+  [
+   "diseno",
+   "parte_de",
+   "parte de",
+   "produccion"
+  ],
+  [
+   "mezcla",
+   "parte_de",
+   "parte de",
+   "produccion"
+  ],
+  [
+   "master",
+   "parte_de",
+   "parte de",
+   "produccion"
+  ],
+  [
+   "composicion",
+   "antes",
+   "va antes de",
+   "diseno"
+  ],
+  [
+   "diseno",
+   "antes",
+   "va antes de",
+   "mezcla"
+  ],
+  [
+   "mezcla",
+   "antes",
+   "va antes de",
+   "master"
+  ],
+  [
+   "master",
+   "antes",
+   "va antes de",
+   "distribucion"
+  ],
+  [
+   "melodia",
+   "parte_de",
+   "parte de",
+   "composicion"
+  ],
+  [
+   "armonia",
+   "parte_de",
+   "parte de",
+   "composicion"
+  ],
+  [
+   "ritmo",
+   "parte_de",
+   "parte de",
+   "composicion"
+  ],
+  [
+   "letra",
+   "parte_de",
+   "parte de",
+   "composicion"
+  ],
+  [
+   "estructura",
+   "parte_de",
+   "parte de",
+   "composicion"
+  ],
+  [
+   "gancho",
+   "es_un",
+   "es una",
+   "melodia"
+  ],
+  [
+   "coro",
+   "parte_de",
+   "parte de",
+   "estructura"
+  ],
+  [
+   "progresion",
+   "parte_de",
+   "parte de",
+   "armonia"
+  ],
+  [
+   "sintesis",
+   "parte_de",
+   "parte de",
+   "diseno"
+  ],
+  [
+   "filtro",
+   "parte_de",
+   "parte de",
+   "diseno"
+  ],
+  [
+   "distorsion",
+   "parte_de",
+   "parte de",
+   "diseno"
+  ],
+  [
+   "tiempo",
+   "parte_de",
+   "parte de",
+   "diseno"
+  ],
+  [
+   "fm",
+   "es_un",
+   "es una",
+   "sintesis"
+  ],
+  [
+   "am",
+   "es_un",
+   "es una",
+   "sintesis"
+  ],
+  [
+   "peine",
+   "es_un",
+   "es un",
+   "filtro"
+  ],
+  [
+   "saturacion",
+   "es_un",
+   "es una",
+   "distorsion"
+  ],
+  [
+   "reverb",
+   "es_un",
+   "es un",
+   "tiempo"
+  ],
+  [
+   "delay",
+   "es_un",
+   "es un",
+   "tiempo"
+  ],
+  [
+   "sintesis",
+   "afecta",
+   "crea",
+   "timbre"
+  ],
+  [
+   "filtro",
+   "afecta",
+   "modifica",
+   "timbre"
+  ],
+  [
+   "distorsion",
+   "afecta",
+   "genera",
+   "armonicos"
+  ],
+  [
+   "armonicos",
+   "afecta",
+   "definen",
+   "timbre"
+  ],
+  [
+   "tiempo",
+   "afecta",
+   "crean",
+   "profundidad"
+  ],
+  [
+   "estatica",
+   "parte_de",
+   "parte de",
+   "mezcla"
+  ],
+  [
+   "dinamica",
+   "parte_de",
+   "parte de",
+   "mezcla"
+  ],
+  [
+   "eq",
+   "parte_de",
+   "parte de",
+   "mezcla"
+  ],
+  [
+   "compresion",
+   "parte_de",
+   "parte de",
+   "mezcla"
+  ],
+  [
+   "midside",
+   "parte_de",
+   "parte de",
+   "mezcla"
+  ],
+  [
+   "estatica",
+   "usa",
+   "usa",
+   "niveles"
+  ],
+  [
+   "estatica",
+   "usa",
+   "usa",
+   "paneo"
+  ],
+  [
+   "dinamica",
+   "usa",
+   "usa",
+   "automatizacion"
+  ],
+  [
+   "automatizacion",
+   "afecta",
+   "mueve",
+   "niveles"
+  ],
+  [
+   "compresion",
+   "afecta",
+   "controla",
+   "rango"
+  ],
+  [
+   "paneo",
+   "afecta",
+   "define",
+   "estereo"
+  ],
+  [
+   "midside",
+   "afecta",
+   "controla",
+   "estereo"
+  ],
+  [
+   "fase",
+   "afecta",
+   "altera",
+   "estereo"
+  ],
+  [
+   "fase",
+   "afecta",
+   "provoca",
+   "peine"
+  ],
+  [
+   "mezcla",
+   "afecta",
+   "cuida",
+   "fase"
+  ],
+  [
+   "eq",
+   "es_un",
+   "es un",
+   "filtro"
+  ],
+  [
+   "limitador",
+   "es_un",
+   "es un tipo de",
+   "compresion"
+  ],
+  [
+   "master",
+   "usa",
+   "usa",
+   "limitador"
+  ],
+  [
+   "master",
+   "usa",
+   "usa",
+   "eq"
+  ],
+  [
+   "master",
+   "usa",
+   "usa",
+   "midside"
+  ],
+  [
+   "limitador",
+   "afecta",
+   "sube",
+   "loudness"
+  ],
+  [
+   "distribucion",
+   "usa",
+   "usa",
+   "normalizacion"
+  ],
+  [
+   "normalizacion",
+   "afecta",
+   "ajusta",
+   "loudness"
+  ]
+ ]
+}
