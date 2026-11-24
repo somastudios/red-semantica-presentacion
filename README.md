@@ -15,8 +15,13 @@ Abre `presentacion.html` en Chrome o Edge. Es un solo archivo y funciona sin int
 | ← | Regresar |
 | F | Pantalla completa |
 | N | Notas para quien expone |
+| / | Escribir en el composer (pregúntale a la red) |
 
 Las diapositivas de cada etapa tienen demos de audio (progresión de acordes, síntesis AM/FM, saturación, filtro peine, paneo, fase y limitador). Revisa el volumen del salón antes.
+
+## Pregúntale a la red
+
+La barra de abajo acepta preguntas en español ("¿La saturación cambia el timbre?"). Encuentra los conceptos que mencionas y busca un camino de flechas entre ellos; si no hay camino, responde que no. En modo *Explicar* describe un concepto y sus relaciones. El micrófono usa el dictado del navegador (Chrome, necesita internet) y el botón + carga stems.
 
 ## Estudio (bonus)
 
@@ -35,7 +40,8 @@ El tempo y el acorde son estimaciones: funcionan bien con stems limpios y se con
 - `src/index.src.html` — la presentación (HTML, CSS y JS).
 - `src/graph.json` — la red: conceptos, etapas y relaciones (sujeto, tipo, etiqueta, objeto).
 - `src/layout.json` — posición de cada nodo.
-- `vendor/` — GSAP 3.15 (MorphSVG, SplitText, CustomEase) y fuentes (Instrument Serif, Geist, JetBrains Mono).
+- `vendor/` — GSAP 3.15 (MorphSVG, SplitText, CustomEase) y fuentes (Anton, Instrument Serif, Geist, JetBrains Mono).
+- `src/ask.js` — el composer y el motor de preguntas.
 - `src/tx.js` — transiciones: fundido, apertura circular y, entre diapositivas de la red, solo movimiento de cámara.
 - `src/estudio.js`, `src/estudio.css` — el estudio de stems.
 - `build.mjs` — incrusta todo en `presentacion.html`.

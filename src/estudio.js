@@ -5,12 +5,12 @@
    LUFS (aprox. BS.1770), true peak, correlación y espectro.
    ============================================================ */
 const ROLES = {
-  voz:     { name: 'Voz',      color: '#F07155', re: /voz|vocal|vox|voice|acapella|canto|coro/i, node: 'Letra' },
-  bateria: { name: 'Batería',  color: '#E9B44C', re: /drum|bater|perc|kick|snare|hat|beat|bombo|tambor|loop/i, node: 'Ritmo' },
-  bajo:    { name: 'Bajo',     color: '#A393F5', re: /bajo|bass|808|sub/i, node: 'Rango dinámico' },
-  melodia: { name: 'Melodía',  color: '#F29CB9', re: /melod|lead|hook|arp|line|riff/i, node: 'Melodía' },
-  acordes: { name: 'Acordes',  color: '#45C4B0', re: /acord|chord|keys|piano|pad|guitar|guitarra|synth|rhodes|organ|teclado/i, node: 'Armonía' },
-  otro:    { name: 'Otro',     color: '#D9CFBF', re: /$^/, node: '' },
+  voz:     { name: 'Voz',      color: '#FF6B4A', re: /voz|vocal|vox|voice|acapella|canto|coro/i, node: 'Letra' },
+  bateria: { name: 'Batería',  color: '#FFB340', re: /drum|bater|perc|kick|snare|hat|beat|bombo|tambor|loop/i, node: 'Ritmo' },
+  bajo:    { name: 'Bajo',     color: '#A98BFF', re: /bajo|bass|808|sub/i, node: 'Rango dinámico' },
+  melodia: { name: 'Melodía',  color: '#FF7EB6', re: /melod|lead|hook|arp|line|riff/i, node: 'Melodía' },
+  acordes: { name: 'Acordes',  color: '#3DDBC5', re: /acord|chord|keys|piano|pad|guitar|guitarra|synth|rhodes|organ|teclado/i, node: 'Armonía' },
+  otro:    { name: 'Otro',     color: '#E5E5EA', re: /$^/, node: '' },
 };
 const ROLE_ORDER = ['voz', 'bateria', 'bajo', 'melodia', 'acordes'];
 const guessRole = n => ROLE_ORDER.find(r => ROLES[r].re.test(n)) || 'otro';
@@ -244,7 +244,7 @@ function drawScene(now, dt, pos) {
   const loud = Math.max(0, Math.min(1, (MT.disp.S + 40) / 32));
 
   // fondo: malla de gradientes según el acorde
-  x.fillStyle = '#100F0D'; x.fillRect(0, 0, W, H);
+  x.fillStyle = '#050505'; x.fillRect(0, 0, W, H);
   const blobs = [[.22 + .05 * Math.sin(now * .3), .3, h], [.78, .65 + .06 * Math.cos(now * .25), (h + 40) % 360], [.5 + .1 * Math.sin(now * .2), .95, (h + 320) % 360]];
   for (const [bx, by, bh] of blobs) { const g = x.createRadialGradient(bx * W, by * H, 0, bx * W, by * H, W * .55); g.addColorStop(0, hsl(bh, 70, light, .22 + loud * .25)); g.addColorStop(1, hsl(bh, 70, light, 0)); x.fillStyle = g; x.fillRect(0, 0, W, H); }
 
@@ -276,12 +276,12 @@ function drawScene(now, dt, pos) {
 
   // partículas de la tarola
   VS.parts = VS.parts.filter(p => (p.x += p.vx * dt, p.y += p.vy * dt, p.vx *= .96, p.vy *= .96, p.life -= dt * 1.3, p.life > 0));
-  x.fillStyle = '#E9B44C'; for (const p of VS.parts) { x.globalAlpha = p.life; x.fillRect(p.x, p.y, p.s, p.s); } x.globalAlpha = 1;
+  x.fillStyle = '#FFB340'; for (const p of VS.parts) { x.globalAlpha = p.life; x.fillRect(p.x, p.y, p.s, p.s); } x.globalAlpha = 1;
 
   // línea de la melodía
   VS.mel.push({ t: now, y: FX.pitchOn ? FX.pitch : null, a: FX.melodia || FX.voz });
   while (VS.mel.length && now - VS.mel[0].t > 4) VS.mel.shift();
-  x.strokeStyle = '#F29CB9'; x.lineCap = 'round'; x.lineJoin = 'round';
+  x.strokeStyle = '#FF7EB6'; x.lineCap = 'round'; x.lineJoin = 'round';
   let pen = false; x.beginPath();
   VS.mel.forEach((m, i) => { if (m.y == null || m.a < .12) { pen = false; return; } const px = W - 30 - (now - m.t) / 4 * (W - 60), py = H * .82 - m.y * H * .62 + jit(i, VS.seed) * 1.5; pen ? x.lineTo(px, py) : x.moveTo(px, py); pen = true; });
   x.lineWidth = 2.5 + FX.melodia * 4; x.globalAlpha = .9; x.stroke(); x.globalAlpha = 1;
@@ -295,26 +295,26 @@ function drawScene(now, dt, pos) {
   let px = W / 2 - tw / 2; const by = H * .84;
   [...title].forEach((ch, i) => {
     const dy = Math.sin(now * 7 + i * .9) * v * 8 + jit(i, VS.seed) * v * 2;
-    x.fillStyle = '#EEE7DB'; x.fillText(ch, px, by + dy); px += ws[i] + track;
+    x.fillStyle = '#F5F5F7'; x.fillText(ch, px, by + dy); px += ws[i] + track;
   });
 
   // la red escuchando
   const corrW = Math.max(0, Math.min(1, 1 - MT.corr));
-  const chips = [['Ritmo', Math.max(VS.kick, VS.snare * .8, FX.bateria * .5), '#E9B44C'], ['Armonía', Math.max(FX.acordes * .7, FX.chordConf), '#45C4B0'], ['Melodía', FX.melodia, '#F29CB9'], ['Letra', FX.voz, '#F07155'], ['Rango dinámico', Math.min(1, MT.crest / 20) * (ST.playing ? 1 : 0), '#A393F5'], ['Imagen estéreo', corrW * 2.2 * (ST.playing ? 1 : 0), '#D9CFBF'], ['Loudness', loud * (ST.playing ? 1 : 0), '#EEE7DB']];
-  x.font = '400 10.5px Mono'; x.fillStyle = 'rgba(238,231,219,.5)'; x.fillText('LA RED, ESCUCHANDO', 22, 28);
+  const chips = [['Ritmo', Math.max(VS.kick, VS.snare * .8, FX.bateria * .5), '#FFB340'], ['Armonía', Math.max(FX.acordes * .7, FX.chordConf), '#3DDBC5'], ['Melodía', FX.melodia, '#FF7EB6'], ['Letra', FX.voz, '#FF6B4A'], ['Rango dinámico', Math.min(1, MT.crest / 20) * (ST.playing ? 1 : 0), '#A98BFF'], ['Imagen estéreo', corrW * 2.2 * (ST.playing ? 1 : 0), '#E5E5EA'], ['Loudness', loud * (ST.playing ? 1 : 0), '#F5F5F7']];
+  x.font = '400 10.5px Mono'; x.fillStyle = 'rgba(245,245,247,.5)'; x.fillText('LA RED, ESCUCHANDO', 22, 28);
   let chx = 22; x.font = '500 13px Geist';
   chips.forEach(([n, g, col]) => {
     g = Math.max(0, Math.min(1, g)); const w = x.measureText(n).width + 24;
     x.globalAlpha = .25 + g * .75; x.strokeStyle = col; x.lineWidth = 1.2; x.beginPath(); x.roundRect(chx, 40, w, 26, 13); x.stroke();
     if (g > .05) { x.fillStyle = col; x.globalAlpha = g * .9; x.fill(); }
-    x.globalAlpha = 1; x.fillStyle = g > .5 ? '#141210' : '#EEE7DB'; x.fillText(n, chx + 12, 57.5); chx += w + 8;
+    x.globalAlpha = 1; x.fillStyle = g > .5 ? '#050505' : '#F5F5F7'; x.fillText(n, chx + 12, 57.5); chx += w + 8;
   });
   // acorde, tempo y pulso
-  x.textAlign = 'right'; x.font = 'italic 400 54px Serif'; x.fillStyle = '#EEE7DB'; x.globalAlpha = .4 + FX.chordConf * .6; x.fillText(FX.chord || '—', W - 24, 64); x.globalAlpha = 1;
-  x.font = '400 10.5px Mono'; x.fillStyle = 'rgba(238,231,219,.55)'; x.fillText('ACORDE ESTIMADO', W - 24, 84);
+  x.textAlign = 'right'; x.font = '400 56px Anton'; x.fillStyle = '#F5F5F7'; x.globalAlpha = .4 + FX.chordConf * .6; x.fillText(FX.chord || '—', W - 24, 64); x.globalAlpha = 1;
+  x.font = '400 10.5px Mono'; x.fillStyle = 'rgba(245,245,247,.55)'; x.fillText('ACORDE ESTIMADO', W - 24, 84);
   x.fillText(ST.bpm ? `${ST.bpm} BPM` : '', W - 24, 100); x.textAlign = 'left';
-  for (let i = 0; i < 4; i++) { const on = ST.playing && (((VS.beatN % 4) + 4) % 4) === i; x.fillStyle = on ? hsl(h, 80, 75, .5 + VS.beat * .5) : 'rgba(238,231,219,.15)'; x.beginPath(); x.arc(28 + i * 16, H - 22, on ? 5 + VS.beat * 2 : 4, 0, 6.283); x.fill(); }
-  if (!ST.stems.length) { x.textAlign = 'center'; x.font = '400 15px Geist'; x.fillStyle = 'rgba(238,231,219,.7)'; x.fillText('Carga tus stems o usa la demo para empezar.', W / 2, H * .44 + 5); x.textAlign = 'left'; }
+  for (let i = 0; i < 4; i++) { const on = ST.playing && (((VS.beatN % 4) + 4) % 4) === i; x.fillStyle = on ? hsl(h, 80, 75, .5 + VS.beat * .5) : 'rgba(245,245,247,.15)'; x.beginPath(); x.arc(28 + i * 16, H - 22, on ? 5 + VS.beat * 2 : 4, 0, 6.283); x.fill(); }
+  if (!ST.stems.length) { x.textAlign = 'center'; x.font = '400 15px Geist'; x.fillStyle = 'rgba(245,245,247,.7)'; x.fillText('Carga tus stems o usa la demo para empezar.', W / 2, H * .44 + 5); x.textAlign = 'left'; }
   // grano de película
   x.globalAlpha = .9; const gx = -Math.random() * 160, gy = -Math.random() * 160; for (let yy = gy; yy < H; yy += 160) for (let xx = gx; xx < W; xx += 160) x.drawImage(grainTile, xx, yy); x.globalAlpha = 1;
 }
@@ -331,46 +331,46 @@ function stDrawLanes() {
 }
 function drawTimeline(pos) {
   const x = tx2, W = 990, H = 100; x.clearRect(0, 0, W, H);
-  x.fillStyle = 'rgba(26,24,21,.8)'; x.beginPath(); x.roundRect(0, 0, W, H, 12); x.fill();
-  if (!ST.stems.length) { x.fillStyle = 'rgba(238,231,219,.35)'; x.font = '400 12px Mono'; x.fillText('LÍNEA DE TIEMPO', 16, 54); return; }
-  if (ST.beats.length) { ST.beats.forEach((t, i) => { const bx = t / ST.dur * W; x.fillStyle = i % 4 === 0 ? 'rgba(238,231,219,.16)' : 'rgba(238,231,219,.05)'; x.fillRect(bx, 0, 1, H); }); }
+  x.fillStyle = 'rgba(28,28,30,.8)'; x.beginPath(); x.roundRect(0, 0, W, H, 12); x.fill();
+  if (!ST.stems.length) { x.fillStyle = 'rgba(245,245,247,.35)'; x.font = '400 12px Mono'; x.fillText('LÍNEA DE TIEMPO', 16, 54); return; }
+  if (ST.beats.length) { ST.beats.forEach((t, i) => { const bx = t / ST.dur * W; x.fillStyle = i % 4 === 0 ? 'rgba(245,245,247,.16)' : 'rgba(245,245,247,.05)'; x.fillRect(bx, 0, 1, H); }); }
   if (laneCache) x.drawImage(laneCache, 0, 0, W, H);
-  ST.stems.forEach((s, i) => { if (s.mute || (ST.stems.some(q => q.solo) && !s.solo)) { const lh = (H - 8) / ST.stems.length; x.fillStyle = 'rgba(18,17,15,.72)'; x.fillRect(0, 4 + i * lh, W, lh); } });
-  if (MT.st.length > 1) { x.strokeStyle = 'rgba(238,231,219,.85)'; x.lineWidth = 1.5; x.beginPath(); MT.st.forEach((p, i) => { const px = p.t / ST.dur * W, py = H - 6 - Math.max(0, Math.min(1, (p.v + 40) / 36)) * (H - 12); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.stroke(); }
-  const px = pos / ST.dur * W; x.fillStyle = '#EEE7DB'; x.fillRect(px - 1, 0, 2, H);
+  ST.stems.forEach((s, i) => { if (s.mute || (ST.stems.some(q => q.solo) && !s.solo)) { const lh = (H - 8) / ST.stems.length; x.fillStyle = 'rgba(0,0,0,.72)'; x.fillRect(0, 4 + i * lh, W, lh); } });
+  if (MT.st.length > 1) { x.strokeStyle = 'rgba(245,245,247,.85)'; x.lineWidth = 1.5; x.beginPath(); MT.st.forEach((p, i) => { const px = p.t / ST.dur * W, py = H - 6 - Math.max(0, Math.min(1, (p.v + 40) / 36)) * (H - 12); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.stroke(); }
+  const px = pos / ST.dur * W; x.fillStyle = '#F5F5F7'; x.fillRect(px - 1, 0, 2, H);
   x.beginPath(); x.moveTo(px - 6, 0); x.lineTo(px + 6, 0); x.lineTo(px, 8); x.fill();
 }
 
 /* ---------- medidores ---------- */
 function drawMeters(now) {
   const x = mx, W = 990, H = 136; x.clearRect(0, 0, W, H);
-  const card = (x0, w, label) => { x.fillStyle = 'rgba(26,24,21,.8)'; x.beginPath(); x.roundRect(x0, 0, w, H, 12); x.fill(); x.fillStyle = 'rgba(238,231,219,.45)'; x.font = '400 10px Mono'; x.fillText(label, x0 + 14, 18); };
+  const card = (x0, w, label) => { x.fillStyle = 'rgba(28,28,30,.8)'; x.beginPath(); x.roundRect(x0, 0, w, H, 12); x.fill(); x.fillStyle = 'rgba(245,245,247,.45)'; x.font = '400 10px Mono'; x.fillText(label, x0 + 14, 18); };
   const f = v => isFinite(v) && v > -69 ? v.toFixed(1).replace('-', '−') : '—';
   // LUFS
   card(0, 262, 'LOUDNESS · LUFS (APROX.)');
-  x.fillStyle = '#EEE7DB'; x.font = '400 50px Serif'; x.fillText(f(MT.I > -70 ? MT.disp.I : -Infinity), 14, 66);
-  x.font = '400 10px Mono'; x.fillStyle = 'rgba(238,231,219,.5)'; x.fillText('INTEGRADO', 16, 82);
+  x.fillStyle = '#F5F5F7'; x.font = '400 50px Serif'; x.fillText(f(MT.I > -70 ? MT.disp.I : -Infinity), 14, 66);
+  x.font = '400 10px Mono'; x.fillStyle = 'rgba(245,245,247,.5)'; x.fillText('INTEGRADO', 16, 82);
   [['M', MT.M > -70 ? MT.disp.M : -Infinity], ['S', MT.S > -70 ? MT.disp.S : -Infinity], ['LRA', MT.LRA || -Infinity], ['TP', MT.tpMax]].forEach(([k, v], i) => {
-    x.fillStyle = 'rgba(238,231,219,.45)'; x.fillText(k, 140, 34 + i * 15); x.fillStyle = k === 'TP' && MT.tpMax > -1 ? '#F07155' : '#EEE7DB'; x.textAlign = 'right'; x.fillText(k === 'LRA' ? (MT.LRA ? MT.LRA.toFixed(1) + ' LU' : '—') : f(v) + (k === 'TP' ? ' dBTP' : ''), 250, 34 + i * 15); x.textAlign = 'left';
+    x.fillStyle = 'rgba(245,245,247,.45)'; x.fillText(k, 140, 34 + i * 15); x.fillStyle = k === 'TP' && MT.tpMax > -1 ? '#FF6B4A' : '#F5F5F7'; x.textAlign = 'right'; x.fillText(k === 'LRA' ? (MT.LRA ? MT.LRA.toFixed(1) + ' LU' : '—') : f(v) + (k === 'TP' ? ' dBTP' : ''), 250, 34 + i * 15); x.textAlign = 'left';
   });
-  const bx = 14, bw = 234, by = 104; x.fillStyle = 'rgba(238,231,219,.1)'; x.fillRect(bx, by, bw, 6);
-  const sv = Math.max(0, Math.min(1, (MT.disp.S + 40) / 40)); const g = x.createLinearGradient(bx, 0, bx + bw, 0); g.addColorStop(0, '#45C4B0'); g.addColorStop(.7, '#E9B44C'); g.addColorStop(1, '#F07155'); x.fillStyle = g; x.fillRect(bx, by, bw * (MT.S > -70 ? sv : 0), 6);
-  const tg = bx + bw * (26 / 40); x.fillStyle = '#A393F5'; x.fillRect(tg - 1, by - 4, 2, 14); x.font = '400 9px Mono'; x.fillStyle = 'rgba(163,147,245,.9)'; x.fillText('−14 SPOTIFY', tg - 28, by + 24);
+  const bx = 14, bw = 234, by = 104; x.fillStyle = 'rgba(245,245,247,.1)'; x.fillRect(bx, by, bw, 6);
+  const sv = Math.max(0, Math.min(1, (MT.disp.S + 40) / 40)); const g = x.createLinearGradient(bx, 0, bx + bw, 0); g.addColorStop(0, '#3DDBC5'); g.addColorStop(.7, '#FFB340'); g.addColorStop(1, '#FF6B4A'); x.fillStyle = g; x.fillRect(bx, by, bw * (MT.S > -70 ? sv : 0), 6);
+  const tg = bx + bw * (26 / 40); x.fillStyle = '#A98BFF'; x.fillRect(tg - 1, by - 4, 2, 14); x.font = '400 9px Mono'; x.fillStyle = 'rgba(163,147,245,.9)'; x.fillText('−14 SPOTIFY', tg - 28, by + 24);
   // espectro
   card(272, 380, 'ESPECTRO');
   const sx0 = 286, sw = 352, sh = 92, sy = 120; const bwid = sw / 44;
-  for (let b = 0; b < 44; b++) { const v = MT.bands[b]; const gg = x.createLinearGradient(0, sy - sh, 0, sy); gg.addColorStop(0, '#F07155'); gg.addColorStop(.5, '#E9B44C'); gg.addColorStop(1, '#45C4B0'); x.fillStyle = gg; x.fillRect(sx0 + b * bwid, sy - v * sh, bwid - 2, v * sh); x.fillStyle = '#EEE7DB'; x.fillRect(sx0 + b * bwid, sy - MT.caps[b] * sh - 2, bwid - 2, 1.5); }
-  x.fillStyle = 'rgba(238,231,219,.35)'; x.font = '400 9px Mono'; [[100, '100'], [1000, '1k'], [10000, '10k']].forEach(([hz, l]) => { const p = Math.log(hz / 30) / Math.log(16000 / 30); x.fillText(l, sx0 + p * sw - 6, 132); });
+  for (let b = 0; b < 44; b++) { const v = MT.bands[b]; const gg = x.createLinearGradient(0, sy - sh, 0, sy); gg.addColorStop(0, '#FF6B4A'); gg.addColorStop(.5, '#FFB340'); gg.addColorStop(1, '#3DDBC5'); x.fillStyle = gg; x.fillRect(sx0 + b * bwid, sy - v * sh, bwid - 2, v * sh); x.fillStyle = '#F5F5F7'; x.fillRect(sx0 + b * bwid, sy - MT.caps[b] * sh - 2, bwid - 2, 1.5); }
+  x.fillStyle = 'rgba(245,245,247,.35)'; x.font = '400 9px Mono'; [[100, '100'], [1000, '1k'], [10000, '10k']].forEach(([hz, l]) => { const p = Math.log(hz / 30) / Math.log(16000 / 30); x.fillText(l, sx0 + p * sw - 6, 132); });
   // picos L/R
   card(662, 136, 'PICO');
   const mH = 96, my = 112; const dbY = db => my - Math.max(0, Math.min(1, (db + 48) / 48)) * mH;
-  [0, 1].forEach(i => { const mxx = 690 + i * 26; x.fillStyle = 'rgba(238,231,219,.1)'; x.fillRect(mxx, my - mH, 14, mH); const top = dbY(MT.pk[i]); const gg = x.createLinearGradient(0, my - mH, 0, my); gg.addColorStop(0, '#F07155'); gg.addColorStop(.25, '#E9B44C'); gg.addColorStop(1, '#45C4B0'); x.fillStyle = gg; x.fillRect(mxx, top, 14, my - top); x.fillStyle = '#EEE7DB'; x.fillRect(mxx, dbY(MT.hold[i][0]) - 1, 14, 2); x.fillStyle = 'rgba(238,231,219,.5)'; x.fillText(i ? 'R' : 'L', mxx + 4, 128); });
-  x.font = '400 9px Mono'; [0, -6, -12, -24, -48].forEach(db => { x.fillStyle = 'rgba(238,231,219,.35)'; x.fillText(String(db).replace('-', '−'), 750, dbY(db) + 3); });
+  [0, 1].forEach(i => { const mxx = 690 + i * 26; x.fillStyle = 'rgba(245,245,247,.1)'; x.fillRect(mxx, my - mH, 14, mH); const top = dbY(MT.pk[i]); const gg = x.createLinearGradient(0, my - mH, 0, my); gg.addColorStop(0, '#FF6B4A'); gg.addColorStop(.25, '#FFB340'); gg.addColorStop(1, '#3DDBC5'); x.fillStyle = gg; x.fillRect(mxx, top, 14, my - top); x.fillStyle = '#F5F5F7'; x.fillRect(mxx, dbY(MT.hold[i][0]) - 1, 14, 2); x.fillStyle = 'rgba(245,245,247,.5)'; x.fillText(i ? 'R' : 'L', mxx + 4, 128); });
+  x.font = '400 9px Mono'; [0, -6, -12, -24, -48].forEach(db => { x.fillStyle = 'rgba(245,245,247,.35)'; x.fillText(String(db).replace('-', '−'), 750, dbY(db) + 3); });
   // correlación + distribución de loudness
   card(808, 182, 'CORRELACIÓN · DISTRIBUCIÓN');
-  const cx0 = 822, cw = 154, cy0 = 38; x.fillStyle = 'rgba(238,231,219,.1)'; x.fillRect(cx0, cy0, cw, 4);
-  const cp = cx0 + (MT.corr + 1) / 2 * cw; x.fillStyle = MT.corr < 0 ? '#F07155' : '#45C4B0'; x.beginPath(); x.arc(cp, cy0 + 2, 6, 0, 6.283); x.fill();
-  x.fillStyle = 'rgba(238,231,219,.4)'; x.fillText('−1', cx0 - 2, cy0 + 18); x.fillText('0', cx0 + cw / 2 - 3, cy0 + 18); x.fillText('+1', cx0 + cw - 10, cy0 + 18);
+  const cx0 = 822, cw = 154, cy0 = 38; x.fillStyle = 'rgba(245,245,247,.1)'; x.fillRect(cx0, cy0, cw, 4);
+  const cp = cx0 + (MT.corr + 1) / 2 * cw; x.fillStyle = MT.corr < 0 ? '#FF6B4A' : '#3DDBC5'; x.beginPath(); x.arc(cp, cy0 + 2, 6, 0, 6.283); x.fill();
+  x.fillStyle = 'rgba(245,245,247,.4)'; x.fillText('−1', cx0 - 2, cy0 + 18); x.fillText('0', cx0 + cw / 2 - 3, cy0 + 18); x.fillText('+1', cx0 + cw - 10, cy0 + 18);
   const bins = new Array(30).fill(0); MT.st.forEach(p => { const b = Math.floor((p.v + 40) / 40 * 30); if (b >= 0 && b < 30) bins[b]++; }); const bm = Math.max(1, ...bins);
   bins.forEach((v, i) => { const hh = v / bm * 56; x.fillStyle = 'rgba(163,147,245,.8)'; x.fillRect(cx0 + i * (cw / 30), 124 - hh, cw / 30 - 1, hh); });
 }

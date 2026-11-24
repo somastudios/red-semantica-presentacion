@@ -6,6 +6,7 @@ const parts = {
   '@@FONT_SERIF@@': b64('vendor/instrument-serif-latin-400-normal.woff2'),
   '@@FONT_SERIF_ITALIC@@': b64('vendor/instrument-serif-latin-400-italic.woff2'),
   '@@FONT_GEIST@@': b64('vendor/geist-latin-wght-normal.woff2'),
+  '@@FONT_ANTON@@': b64('vendor/anton-latin-400-normal.woff2'),
   '@@FONT_MONO@@': b64('vendor/jetbrains-mono-latin-400-normal.woff2'),
   '/*@@GSAP@@*/': r('vendor/gsap.min.js'),
   '/*@@MORPH@@*/': r('vendor/MorphSVGPlugin.min.js'),
@@ -14,6 +15,7 @@ const parts = {
   '/*@@ESTUDIO_CSS@@*/': r('src/estudio.css'),
   '/*@@TX@@*/': r('src/tx.js'),
   '/*@@ESTUDIO@@*/': r('src/estudio.js'),
+  '/*@@ASK@@*/': r('src/ask.js'),
   '/*@@GRAPH@@*/null': JSON.stringify(JSON.parse(r('src/graph.json'))),
   '/*@@LAYOUT@@*/null': r('src/layout.json').trim(),
 };
