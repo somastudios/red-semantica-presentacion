@@ -36,7 +36,7 @@ El tempo y el acorde son estimaciones: funcionan bien con stems limpios y se con
 - `src/graph.json` — la red: conceptos, etapas y relaciones (sujeto, tipo, etiqueta, objeto).
 - `src/layout.json` — posición de cada nodo.
 - `vendor/` — GSAP 3.15 (MorphSVG, SplitText, CustomEase) y fuentes (Instrument Serif, Geist, JetBrains Mono).
-- `src/tx.js` — transiciones (iris, paneles diagonales, cortina líquida).
+- `src/tx.js` — transiciones: fundido, apertura circular y, entre diapositivas de la red, solo movimiento de cámara.
 - `src/estudio.js`, `src/estudio.css` — el estudio de stems.
 - `build.mjs` — incrusta todo en `presentacion.html`.
 

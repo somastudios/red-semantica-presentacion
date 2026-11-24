@@ -200,34 +200,28 @@ em{font-style:italic}
 .fact{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:16px;border:1px dashed var(--line2);font:400 16px/1.5 var(--sans);color:var(--ink2)}
 .fact b{font:400 12px var(--mono);letter-spacing:.12em;color:var(--master);text-transform:uppercase;white-space:nowrap;padding-top:3px}
 
-/* ---------- escala tipográfica y capas nuevas ---------- */
-.display{font-size:210px;line-height:.88}
-.h2{font-size:96px;line-height:.97;letter-spacing:-.022em}
-.h2.sm{font-size:76px}
-.h2.md{font-size:88px}
+/* ---------- escala tipográfica y capas ---------- */
+.display{font-size:192px;line-height:.9}
+.h2{font-size:84px;line-height:1;letter-spacing:-.02em}
+.h2.sm{font-size:64px}
+.h2.md{font-size:74px}
 .col{display:flex;flex-direction:column;gap:24px}
-.col .h2{margin-top:-4px}
-.lead{font-size:26px}
-.lead.sm{font-size:22px}
+.lead{font-size:25px}
+.lead.sm{font-size:21px}
 .team{display:grid;grid-template-columns:repeat(2,max-content);gap:12px 48px;font:400 15px var(--mono);color:var(--ink2);letter-spacing:.03em}
 .team span{display:flex;gap:12px;align-items:center}
 .team span::before{content:"";width:18px;height:1px;background:var(--c,var(--dim))}
 .team .lbl{grid-column:1/-1;color:var(--muted);font-size:12px;letter-spacing:.16em;text-transform:uppercase}
 .team .lbl::before{display:none}
 .team.center{justify-content:center}
-.bignum{pointer-events:none;overflow:visible}
-.bignum text{font:400 760px/1 var(--serif);fill:none;stroke-width:1.3;opacity:.2;letter-spacing:-.04em}
 #glow{position:absolute;inset:-12%;z-index:0;pointer-events:none;--g:#E9B44C;--gx:72%;--gy:45%;
-  background:radial-gradient(38% 48% at var(--gx) var(--gy),color-mix(in srgb,var(--g) 20%,transparent),transparent 72%)}
-#glow::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,var(--g) .9px,transparent 1.4px);background-size:7px 7px;opacity:.28;
-  -webkit-mask-image:radial-gradient(26% 34% at var(--gx) var(--gy),#000,transparent 75%);mask-image:radial-gradient(26% 34% at var(--gx) var(--gy),#000,transparent 75%)}
-#tx{position:absolute;inset:0;width:1600px;height:900px;z-index:9;pointer-events:none;overflow:visible}
-#txSlashH{position:absolute;inset:0;z-index:9;pointer-events:none;visibility:hidden;overflow:hidden}
-.tx-panel{position:absolute;left:0;top:0;height:900px;will-change:transform}
-.tx-panel.dots{background-image:radial-gradient(circle,rgba(20,18,16,.18) 2.3px,transparent 2.8px);background-size:14px 14px}
-#txLabel{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;visibility:hidden}
-.k-sub{font:400 18px var(--mono);letter-spacing:.32em;text-transform:uppercase;margin-bottom:6px}
-.k-main{font:400 italic 196px/1.05 var(--serif);letter-spacing:-.03em;white-space:nowrap;padding:0 .1em}
+  background:radial-gradient(40% 50% at var(--gx) var(--gy),color-mix(in srgb,var(--g) 13%,transparent),transparent 72%)}
+#txVeil{position:absolute;inset:-2px;z-index:9;background:var(--bg);pointer-events:none;visibility:hidden}
+#txIris{position:absolute;inset:-2px;z-index:9;background:var(--bg);pointer-events:none;visibility:hidden;--x:50%;--y:50%;--c:0px;--h:0px;
+  clip-path:circle(var(--c) at var(--x) var(--y));
+  -webkit-mask-image:radial-gradient(circle at var(--x) var(--y),transparent var(--h),#000 calc(var(--h) + 1.5px));
+  mask-image:radial-gradient(circle at var(--x) var(--y),transparent var(--h),#000 calc(var(--h) + 1.5px))}
+#txRing{position:absolute;left:0;top:0;z-index:10;border-radius:50%;border:1px solid var(--ink);pointer-events:none;visibility:hidden}
 .split-line{padding-bottom:.08em}
 @media (prefers-reduced-motion:reduce){.playhead{display:none}}
 /*@@ESTUDIO_CSS@@*/
@@ -317,7 +311,6 @@ em{font-style:italic}
     <!-- 4 · Paso 2 -->
     <section class="slide" data-id="paso2" data-label="Paso 2 · Relaciones"
       data-notes="Paso 2: establecer relaciones. Cada relación es una tripleta: sujeto, relación, objeto. Así la guarda una computadora; leerlas en voz alta: la saturación es una distorsión, etcétera.">
-      <svg class="abs bignum" style="left:-40px;top:250px;width:900px;height:700px" viewBox="0 0 900 700"><text x="0" y="640" style="stroke:var(--diseno)">2</text></svg>
       <div class="abs col" style="left:100px;top:110px;width:600px">
         <div class="eyebrow" data-a><i style="--c:var(--diseno)"></i>Paso 2 de 3 · Relaciones</div>
         <h2 class="h2 split">Luego, conectamos cada par.</h2>
@@ -340,7 +333,6 @@ em{font-style:italic}
     <!-- 6 · Composición -->
     <section class="slide" data-id="comp" data-label="Etapa 1 · Composición" data-stage="comp"
       data-notes="La composición es la raíz. No hay plugins todavía. Tocar la progresión I–V–vi–IV: es la de miles de canciones pop. El gancho es un tipo de melodía y casi siempre vive en el coro.">
-      <svg class="abs bignum" style="left:-60px;top:170px;width:900px;height:760px" viewBox="0 0 900 760"><text x="0" y="700" style="stroke:var(--comp)">01</text></svg>
       <div class="abs col" style="left:90px;top:88px;width:600px">
         <div class="eyebrow" style="--c:var(--comp)" data-a><i></i>Etapa 1 · Composición</div>
         <h2 class="h2 md split">Todo empieza con la canción.</h2>
@@ -360,7 +352,6 @@ em{font-style:italic}
     <!-- 7 · Diseño -->
     <section class="slide" data-id="diseno" data-label="Etapa 2 · Diseño de sonido" data-stage="diseno"
       data-notes="El diseño de sonido trabaja sobre el timbre. Probar cada botón: seno puro, AM, FM, saturación y filtro peine. Remarcar la herencia: la saturación es una distorsión, entonces también genera armónicos.">
-      <svg class="abs bignum" style="left:-60px;top:170px;width:900px;height:760px" viewBox="0 0 900 760"><text x="0" y="700" style="stroke:var(--diseno)">02</text></svg>
       <div class="abs col" style="left:90px;top:88px;width:600px">
         <div class="eyebrow" style="--c:var(--diseno)" data-a><i></i>Etapa 2 · Diseño de sonido</div>
         <h2 class="h2 md split">Luego, le damos su sonido.</h2>
@@ -378,7 +369,6 @@ em{font-style:italic}
     <!-- 8 · Mezcla -->
     <section class="slide" data-id="mezcla" data-label="Etapa 3 · Mezcla" data-stage="mezcla"
       data-notes="Mezcla estática: niveles y paneo, quieta. Mezcla dinámica: automatización, se mueve. Demo de paneo (mejor con audífonos o bocinas estéreo) y demo de fase: dos ondas iguales, se invierte una y desaparece el sonido.">
-      <svg class="abs bignum" style="left:-60px;top:170px;width:900px;height:760px" viewBox="0 0 900 760"><text x="0" y="700" style="stroke:var(--mezcla)">03</text></svg>
       <div class="abs col" style="left:90px;top:88px;width:600px">
         <div class="eyebrow" style="--c:var(--mezcla)" data-a><i></i>Etapa 3 · Mezcla</div>
         <h2 class="h2 md split">Después, que todo quepa.</h2>
@@ -408,7 +398,6 @@ em{font-style:italic}
     <!-- 9 · Master -->
     <section class="slide" data-id="master" data-label="Etapa 4 · Masterización" data-stage="master"
       data-notes="La masterización trabaja sobre la mezcla terminada. Prender y apagar el limitador: suena más fuerte pero pierde dinámica. En la red: el limitador es un tipo de compresión, por eso hereda que controla el rango dinámico. Dato de Spotify: normaliza a −14 LUFS.">
-      <svg class="abs bignum" style="left:-60px;top:170px;width:900px;height:760px" viewBox="0 0 900 760"><text x="0" y="700" style="stroke:var(--master)">04</text></svg>
       <div class="abs col" style="left:90px;top:88px;width:600px">
         <div class="eyebrow" style="--c:var(--master)" data-a><i></i>Etapa 4 · Masterización</div>
         <h2 class="h2 md split">Al final, listo para el mundo.</h2>
@@ -500,19 +489,9 @@ em{font-style:italic}
     </section>
 
   </div>
-  <svg id="tx" viewBox="0 0 1600 900" aria-hidden="true">
-    <defs>
-      <filter id="goo" x="-5%" y="-20%" width="110%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="20" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -11"/></filter>
-      <pattern id="halftone" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="7" cy="7" r="2.3" fill="rgba(20,18,16,.18)"/></pattern>
-      <mask id="irm0" maskUnits="userSpaceOnUse" x="-300" y="-300" width="2200" height="1500"><rect x="-300" y="-300" width="2200" height="1500" fill="#fff"/><path id="irh0" fill="#000"/></mask>
-      <mask id="irm1" maskUnits="userSpaceOnUse" x="-300" y="-300" width="2200" height="1500"><rect x="-300" y="-300" width="2200" height="1500" fill="#fff"/><path id="irh1" fill="#000"/></mask>
-      <mask id="irm2" maskUnits="userSpaceOnUse" x="-300" y="-300" width="2200" height="1500"><rect x="-300" y="-300" width="2200" height="1500" fill="#fff"/><path id="irh2" fill="#000"/></mask>
-    </defs>
-    <g id="txIris" style="visibility:hidden"><g mask="url(#irm0)"><path id="iri0"/></g><g mask="url(#irm1)"><path id="iri1"/></g><g mask="url(#irm2)"><path id="iri2"/></g></g>
-    <g id="txLiquid" filter="url(#goo)" style="visibility:hidden"></g>
-  </svg>
-  <div id="txSlashH"></div>
-  <div id="txLabel"><div class="k-sub"></div><div class="k-main"></div></div>
+  <div id="txVeil"></div>
+  <div id="txIris"></div>
+  <div id="txRing"></div>
   <div class="playhead" id="playhead"></div>
 </div>
 
@@ -675,16 +654,9 @@ function camFor(key) {
   const list = nodes.filter(n => n.stage === key || (key === 'master' && n.stage === 'dist'));
   return fitCam(bbox(list), { x: 700, y: 80, w: 860, h: 740 }, 1.6);
 }
-let chromaTw = null;
-function chromaPulse(dur) {
-  if (REDUCED) return; const o = { d: 0 }; chromaTw?.kill(); G.style.filter = 'url(#chroma)';
-  chromaTw = gsap.to(o, { d: 1, duration: dur / 2, yoyo: true, repeat: 1, ease: 'sine.inOut', onUpdate: () => { $('#chR').setAttribute('dx', -9 * o.d); $('#chB').setAttribute('dx', 9 * o.d); }, onComplete: () => { G.style.filter = ''; } });
-}
 function camTo(key, dur = 1.5) {
   const c = typeof key === 'string' ? camFor(key) : key;
-  const moved = Math.abs(c.x - cam.x) + Math.abs(c.y - cam.y) + Math.abs(c.w - cam.w) > 40;
   gsap.to(cam, { ...c, duration: dur, ease: 'expo.inOut', onUpdate: applyCam, overwrite: true });
-  if (moved && dur > .8 && graphState.visible) chromaPulse(dur);
 }
 
 /* emphasis */
@@ -962,21 +934,19 @@ function animateIn(s, k) {
   gsap.set(s, { autoAlpha: 1 }); s.classList.add('on');
   $$('.split', s).forEach((el, i) => {
     const sp = splitOf(el); gsap.set(el, { autoAlpha: 1 });
-    gsap.fromTo(sp.lines, { yPercent: 122, rotate: 2.5, skewX: -8 }, { yPercent: 0, rotate: 0, skewX: 0, duration: 1.2, ease: 'expo.out', stagger: .085, delay: .12 + i * .1, overwrite: true });
-    gsap.fromTo(sp.lines, { textShadow: '-10px 0 rgba(255,50,90,.75), 10px 0 rgba(40,210,255,.75)' }, { textShadow: '0px 0 rgba(255,50,90,0), 0px 0 rgba(40,210,255,0)', duration: 1.1, ease: 'power3.out', stagger: .085, delay: .12 + i * .1 });
+    gsap.fromTo(sp.lines, { yPercent: 115 }, { yPercent: 0, duration: 1.15, ease: 'expo.out', stagger: .08, delay: .1 + i * .1, overwrite: true });
   });
   const show = itemsOf(s).filter(el => visibleAt(el, k)), hide = itemsOf(s).filter(el => !visibleAt(el, k));
   gsap.set(hide, { autoAlpha: 0 });
-  gsap.fromTo(show, { autoAlpha: 0, y: 34, filter: 'blur(10px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1, ease: 'settle', stagger: .07, delay: .3, overwrite: true, clearProps: 'filter' });
+  gsap.fromTo(show, { autoAlpha: 0, y: 22, filter: 'blur(8px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1, ease: 'expo.out', stagger: .06, delay: .3, overwrite: true, clearProps: 'filter' });
   show.filter(el => el.classList.contains('panel')).forEach((el, i) => gsap.fromTo(el, { clipPath: 'inset(0% 0% 100% 0% round 22px)' }, { clipPath: 'inset(0% 0% 0% 0% round 22px)', duration: 1.1, ease: 'expo.inOut', delay: .35 + i * .08, clearProps: 'clipPath' }));
-  $$('.bignum text', s).forEach(t => { const L = 9000; gsap.fromTo(t, { strokeDasharray: L, strokeDashoffset: L, x: 80 }, { strokeDashoffset: 0, x: 0, duration: 2.6, ease: 'power2.inOut', delay: .2 }); });
   const gl = GLOW[s.dataset.id]; if (gl) gsap.to('#glow', { '--g': gl[0], '--gx': gl[1], '--gy': gl[2], duration: 1.6, ease: 'power2.inOut' });
 }
 const GLOW = { hero: ['#E9B44C', '74%', '46%'], que: ['#F07155', '78%', '42%'], rels: ['#A393F5', '86%', '16%'], paso1: ['#E9B44C', '50%', '70%'], paso2: ['#F07155', '78%', '46%'], paso3: ['#45C4B0', '50%', '56%'], comp: ['#E9B44C', '72%', '45%'], diseno: ['#F07155', '72%', '45%'], mezcla: ['#45C4B0', '72%', '45%'], master: ['#A393F5', '72%', '45%'], infer: ['#A393F5', '66%', '40%'], cierre: ['#45C4B0', '78%', '48%'], estudio: ['#F07155', '62%', '30%'], fin: ['#A393F5', '50%', '48%'] };
 function animateOut(s) {
   s.classList.remove('on');
   const els = [...itemsOf(s), ...$$('.split', s).flatMap(el => el._split ? el._split.lines : [])];
-  gsap.to(itemsOf(s), { autoAlpha: 0, y: -18, filter: 'blur(6px)', duration: .32, ease: 'power2.in', overwrite: true, stagger: .02 });
+  gsap.to(itemsOf(s), { autoAlpha: 0, y: -10, duration: .3, ease: 'power2.in', overwrite: true });
   $$('.split', s).forEach(el => el._split && gsap.to(el._split.lines, { yPercent: -118, duration: .4, ease: 'power2.in', overwrite: true }));
   gsap.to(s, { autoAlpha: 0, duration: .01, delay: .42 });
 }
@@ -994,7 +964,7 @@ let busy = false;
 function go(i, dir = 1, atEnd = false) {
   if (busy || i < 0 || i >= slides.length || i === cur) return;
   stopAll();
-  const prevS = slides[cur]; if (prevS) { animateOut(prevS); HOOK[prevS.dataset.id]?.leave?.(); }
+  const prevS = slides[cur], prevId = prevS?.dataset.id; if (prevS) { animateOut(prevS); HOOK[prevId]?.leave?.(); }
   const first = cur === -1; cur = i; const s = slides[i]; const id = s.dataset.id;
   step = atEnd ? +(s.dataset.steps || 0) : 0;
   history.replaceState(null, '', '#' + (i + 1));
@@ -1007,7 +977,7 @@ function go(i, dir = 1, atEnd = false) {
   };
   if (first || REDUCED) { enter(); return; }
   busy = true;
-  runTx(id, dir, () => { busy = false; enter(); });
+  runTx(id, prevId, () => { busy = false; enter(); });
 }
 function next() { const s = slides[cur]; const n = +(s.dataset.steps || 0); if (step < n) stepTo(step + 1); else go(cur + 1, 1); }
 function prev() { if (step > 0) stepTo(step - 1); else go(cur - 1, -1, true); }
@@ -1027,7 +997,7 @@ HOOK.paso1 = {
 HOOK.paso3 = { graph: true, enter() { applyGraph({ visible: true, layout: 'net', edges: true, cam: 'overview', mode: 'overview' }); } };
 for (const st of ['comp', 'diseno', 'mezcla', 'master']) HOOK[st] = { graph: true, enter() {
   applyGraph({ visible: true, layout: 'net', edges: true, cam: st, mode: 'focus', focus: st });
-  nodes.filter(n => n.stage === st || (st === 'master' && n.stage === 'dist')).sort((a, b) => a.y - b.y).forEach((n, i) => gsap.fromTo(n.el, { scale: .6 }, { scale: 1, duration: 1.1, delay: .55 + i * .045, ease: 'elastic.out(1,.55)', overwrite: 'auto' }));
+  nodes.filter(n => n.stage === st || (st === 'master' && n.stage === 'dist')).sort((a, b) => a.y - b.y).forEach((n, i) => gsap.fromTo(n.el, { scale: .9 }, { scale: 1, duration: .9, delay: .6 + i * .03, ease: 'expo.out', overwrite: 'auto' }));
 } };
 HOOK.estudio = { enter() { stEnter(); }, leave() { stLeave(); } };
 HOOK.infer = {
@@ -1208,8 +1178,8 @@ document.fonts.ready.then(() => {
   buildGraph(); buildMini();
   nodes.forEach(n => { n.el.addEventListener('mouseenter', () => hoverNode(n)); n.el.addEventListener('mouseleave', unhover); });
   $$('.play, .chip, .navb, .q').forEach(el => {
-    el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); gsap.to(el, { x: ((e.clientX - r.left) / r.width - .5) * 10, y: ((e.clientY - r.top) / r.height - .5) * 8, duration: .4, ease: 'power3.out' }); });
-    el.addEventListener('pointerleave', () => gsap.to(el, { x: 0, y: 0, duration: .9, ease: 'elastic.out(1,.35)' }));
+    el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); gsap.to(el, { x: ((e.clientX - r.left) / r.width - .5) * 5, y: ((e.clientY - r.top) / r.height - .5) * 4, duration: .5, ease: 'power3.out' }); });
+    el.addEventListener('pointerleave', () => gsap.to(el, { x: 0, y: 0, duration: .7, ease: 'expo.out' }));
   });
   gsap.set(G, { autoAlpha: 0 }); applyCam();
   const start = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1)) || 1) - 1));

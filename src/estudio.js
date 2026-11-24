@@ -269,7 +269,6 @@ function drawScene(now, dt, pos) {
   const amp = 6 + FX.bajo * 18 + FX.melodia * 12;
   [[1, 1, 2.6], [.78, .55, 1.6], [.58, .3, 1.1]].forEach(([sc, al, lw], i) => {
     const pts = ringPts(R * sc, amp * sc, now * (.12 + i * .05) * (i % 2 ? -1 : 1));
-    if (VS.ab > .05 && i === 0) [['rgba(255,50,90,', -4], ['rgba(50,210,255,', 4]].forEach(([c, o]) => { x.strokeStyle = c + VS.ab * .7 + ')'; x.lineWidth = lw; x.beginPath(); pts.forEach(([px, py], j) => j ? x.lineTo(px + o * VS.ab, py) : x.moveTo(px + o * VS.ab, py)); x.stroke(); });
     x.beginPath(); pts.forEach(([px, py], j) => j ? x.lineTo(px, py) : x.moveTo(px, py));
     if (i === 0) { const g = x.createRadialGradient(cx, cy, 0, cx, cy, R * 1.2); g.addColorStop(0, hsl(h, 75, 60, .05 + FX.bajo * .3)); g.addColorStop(1, hsl(h, 75, 60, 0)); x.fillStyle = g; x.fill(); }
     x.strokeStyle = hsl((h + i * 25) % 360, 70, 82, al); x.lineWidth = lw; x.stroke();
@@ -296,7 +295,6 @@ function drawScene(now, dt, pos) {
   let px = W / 2 - tw / 2; const by = H * .84;
   [...title].forEach((ch, i) => {
     const dy = Math.sin(now * 7 + i * .9) * v * 8 + jit(i, VS.seed) * v * 2;
-    if (VS.ab > .05) { x.fillStyle = `rgba(255,50,90,${VS.ab * .6})`; x.fillText(ch, px - 5 * VS.ab, by + dy); x.fillStyle = `rgba(50,210,255,${VS.ab * .6})`; x.fillText(ch, px + 5 * VS.ab, by + dy); }
     x.fillStyle = '#EEE7DB'; x.fillText(ch, px, by + dy); px += ws[i] + track;
   });
 
