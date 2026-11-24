@@ -3,6 +3,8 @@
 Presentación para **Introducción a la IA · Actividad 2: Crear una red semántica**.
 Explica la producción de una canción (composición → diseño de sonido → mezcla → masterización → distribución) como una red de 41 conceptos y 54 relaciones con nombre.
 
+Equipo: Robin Jay Aguilar García, Diego Alberto Lopez Navia, José Manuel Toro Villalvazo y Daniel Alejandro Cervantes Guzmán.
+
 ## Para presentar
 
 Abre `presentacion.html` en Chrome o Edge. Es un solo archivo y funciona sin internet.
@@ -16,14 +18,26 @@ Abre `presentacion.html` en Chrome o Edge. Es un solo archivo y funciona sin int
 
 Las diapositivas de cada etapa tienen demos de audio (progresión de acordes, síntesis AM/FM, saturación, filtro peine, paneo, fase y limitador). Revisa el volumen del salón antes.
 
-**Nombres del equipo:** edita la constante `EQUIPO` en `src/index.src.html` y vuelve a generar el archivo (o búscala directo en `presentacion.html`).
+## Estudio (bonus)
+
+La diapositiva 13 es un estudio: arrastra stems (voz, bajo, batería, acordes, melodía) o usa la demo, y dale play con Espacio.
+
+- El rol de cada stem se adivina por el nombre del archivo (`vocal`, `bass`, `drums`, `keys`, `lead`…) y se puede cambiar.
+- Todas las pistas arrancan en la misma muestra. Hay solo, mute y búsqueda en la línea de tiempo.
+- Bajo → escala el anillo · batería → ondas y partículas (onsets detectados offline) · melodía → la línea y la forma del anillo · voz → peso de la tipografía · acordes → color (acorde estimado por croma).
+- Medición de la mezcla: LUFS momentáneo, corto e integrado (aprox. BS.1770 con filtro K), LRA, true peak (sobremuestreo 4×), picos, correlación estéreo, espectro y distribución de loudness.
+- "Grabar video" exporta el visual con audio a `.webm`.
+
+El tempo y el acorde son estimaciones: funcionan bien con stems limpios y se confunden con mezclas densas.
 
 ## Estructura
 
 - `src/index.src.html` — la presentación (HTML, CSS y JS).
 - `src/graph.json` — la red: conceptos, etapas y relaciones (sujeto, tipo, etiqueta, objeto).
 - `src/layout.json` — posición de cada nodo.
-- `vendor/` — GSAP 3.15 (MorphSVG, SplitText) y fuentes (Instrument Serif, Geist, JetBrains Mono).
+- `vendor/` — GSAP 3.15 (MorphSVG, SplitText, CustomEase) y fuentes (Instrument Serif, Geist, JetBrains Mono).
+- `src/tx.js` — transiciones (iris, paneles diagonales, cortina líquida).
+- `src/estudio.js`, `src/estudio.css` — el estudio de stems.
 - `build.mjs` — incrusta todo en `presentacion.html`.
 
 ```bash

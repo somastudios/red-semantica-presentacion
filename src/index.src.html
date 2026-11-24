@@ -200,7 +200,37 @@ em{font-style:italic}
 .fact{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:16px;border:1px dashed var(--line2);font:400 16px/1.5 var(--sans);color:var(--ink2)}
 .fact b{font:400 12px var(--mono);letter-spacing:.12em;color:var(--master);text-transform:uppercase;white-space:nowrap;padding-top:3px}
 
+/* ---------- escala tipográfica y capas nuevas ---------- */
+.display{font-size:210px;line-height:.88}
+.h2{font-size:96px;line-height:.97;letter-spacing:-.022em}
+.h2.sm{font-size:76px}
+.h2.md{font-size:88px}
+.col{display:flex;flex-direction:column;gap:24px}
+.col .h2{margin-top:-4px}
+.lead{font-size:26px}
+.lead.sm{font-size:22px}
+.team{display:grid;grid-template-columns:repeat(2,max-content);gap:12px 48px;font:400 15px var(--mono);color:var(--ink2);letter-spacing:.03em}
+.team span{display:flex;gap:12px;align-items:center}
+.team span::before{content:"";width:18px;height:1px;background:var(--c,var(--dim))}
+.team .lbl{grid-column:1/-1;color:var(--muted);font-size:12px;letter-spacing:.16em;text-transform:uppercase}
+.team .lbl::before{display:none}
+.team.center{justify-content:center}
+.bignum{pointer-events:none;overflow:visible}
+.bignum text{font:400 760px/1 var(--serif);fill:none;stroke-width:1.3;opacity:.2;letter-spacing:-.04em}
+#glow{position:absolute;inset:-12%;z-index:0;pointer-events:none;--g:#E9B44C;--gx:72%;--gy:45%;
+  background:radial-gradient(38% 48% at var(--gx) var(--gy),color-mix(in srgb,var(--g) 20%,transparent),transparent 72%)}
+#glow::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,var(--g) .9px,transparent 1.4px);background-size:7px 7px;opacity:.28;
+  -webkit-mask-image:radial-gradient(26% 34% at var(--gx) var(--gy),#000,transparent 75%);mask-image:radial-gradient(26% 34% at var(--gx) var(--gy),#000,transparent 75%)}
+#tx{position:absolute;inset:0;width:1600px;height:900px;z-index:9;pointer-events:none;overflow:visible}
+#txSlashH{position:absolute;inset:0;z-index:9;pointer-events:none;visibility:hidden;overflow:hidden}
+.tx-panel{position:absolute;left:0;top:0;height:900px;will-change:transform}
+.tx-panel.dots{background-image:radial-gradient(circle,rgba(20,18,16,.18) 2.3px,transparent 2.8px);background-size:14px 14px}
+#txLabel{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;visibility:hidden}
+.k-sub{font:400 18px var(--mono);letter-spacing:.32em;text-transform:uppercase;margin-bottom:6px}
+.k-main{font:400 italic 196px/1.05 var(--serif);letter-spacing:-.03em;white-space:nowrap;padding:0 .1em}
+.split-line{padding-bottom:.08em}
 @media (prefers-reduced-motion:reduce){.playhead{display:none}}
+/*@@ESTUDIO_CSS@@*/
 @media (max-width:760px){.count{min-width:0;font-size:11px}.count .lbl,#hint{display:none}#ui{gap:12px;padding:0 14px}}
 </style>
 </head>
@@ -209,12 +239,18 @@ em{font-style:italic}
 <div id="hint">← → para avanzar · N notas · F pantalla completa</div>
 
 <div id="stage">
+  <div id="glow"></div>
   <!-- background: morphing sound rings -->
   <svg id="fx" viewBox="0 0 1600 900" aria-hidden="true">
     <defs>
       <filter id="boil" x="-20%" y="-20%" width="140%" height="140%">
         <feTurbulence id="boilT" type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="1" result="n"/>
         <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="chroma" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+        <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/><feOffset id="chR" in="r" dx="0" result="r2"/>
+        <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="gb"/><feOffset id="chB" in="gb" dx="0" result="gb2"/>
+        <feBlend in="r2" in2="gb2" mode="screen"/>
       </filter>
       <linearGradient id="ringG" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stop-color="#E9B44C"/><stop offset=".5" stop-color="#F07155"/><stop offset="1" stop-color="#A393F5"/>
@@ -242,56 +278,61 @@ em{font-style:italic}
     <!-- 0 · Portada -->
     <section class="slide" data-id="hero" data-label="Portada"
       data-notes="Presentarnos. Vamos a explicar cómo se produce una canción, de la idea al master, usando una red semántica. Spoiler: la red no hace hits, pero sí explica todo lo que hay detrás de uno.">
-      <div class="abs eyebrow" style="left:100px;top:150px" data-a><i style="--c:var(--comp)"></i>Introducción a la IA · Actividad 2 · Red semántica</div>
-      <h1 class="abs display split" style="left:92px;top:205px;width:900px">Cómo hacer<br>un <em class="grad">hitazo</em></h1>
-      <p class="abs lead" style="left:100px;top:585px;width:600px" data-a>Todo lo que pasa entre una idea y una canción terminada, contado como una red semántica.</p>
-      <p class="abs team" style="left:100px;top:770px" data-a id="team"></p>
+      <div class="abs eyebrow" style="left:100px;top:104px" data-a><i style="--c:var(--comp)"></i>Introducción a la IA · Actividad 2 · Red semántica</div>
+      <h1 class="abs display split" style="left:88px;top:146px;width:1000px">Cómo hacer<br>un <em class="grad">hitazo</em></h1>
+      <p class="abs lead" style="left:100px;top:560px;width:560px" data-a>Todo lo que pasa entre una idea y una canción terminada, contado como una red semántica.</p>
+      <div class="abs team" style="left:100px;top:712px;width:900px" data-a id="team"></div>
     </section>
 
     <!-- 1 · Qué es -->
     <section class="slide" data-id="que" data-label="Qué es" data-steps="2"
       data-notes="Definición: nodos = conceptos, arcos = relaciones con nombre. Avanzar: aparecen las flechas. Avanzar otra vez: la herencia. La reverb no dice en ningún lado que es parte del diseño de sonido, pero la red lo deduce.">
-      <div class="abs eyebrow" style="left:100px;top:130px" data-a><i></i>Antes de empezar</div>
-      <h2 class="abs h2 split" style="left:96px;top:175px;width:640px">Una red semántica es un mapa de lo que sabemos.</h2>
-      <p class="abs lead" style="left:100px;top:440px;width:600px" data-a>Los conceptos son <b>nodos</b>. Las relaciones son <b>flechas con nombre</b>. Ese nombre es lo importante: le dice a una computadora qué significa la conexión, no solo que existe.</p>
-      <p class="abs cite" style="left:100px;top:780px" data-a>Propuesta por M. Ross Quillian en 1968 para modelar la memoria semántica.</p>
-      <svg class="abs mini" id="mini" data-a style="left:760px;top:150px;width:800px;height:620px" viewBox="0 0 800 620"></svg>
-      <p class="abs lead sm" style="left:860px;top:720px;width:620px" data-a data-step="2">Si la reverb es un efecto de tiempo, <b>hereda</b> todo lo que sabemos de los efectos de tiempo. La red lo deduce sin que nadie lo escriba.</p>
+      <div class="abs col" style="left:100px;top:100px;width:680px">
+        <div class="eyebrow" data-a><i></i>Antes de empezar</div>
+        <h2 class="h2 split">Una red semántica es un mapa de lo que sabemos.</h2>
+        <p class="lead" style="width:600px" data-a>Los conceptos son <b>nodos</b>. Las relaciones son <b>flechas con nombre</b>. Ese nombre es lo importante: le dice a una computadora qué significa la conexión, no solo que existe.</p>
+      </div>
+      <p class="abs cite" style="left:100px;top:800px" data-a>Propuesta por M. Ross Quillian en 1968 para modelar la memoria semántica.</p>
+      <svg class="abs mini" id="mini" data-a style="left:800px;top:150px;width:800px;height:620px" viewBox="0 0 800 620"></svg>
+      <p class="abs lead sm" style="left:880px;top:730px;width:620px" data-a data-step="2">Si la reverb es un efecto de tiempo, <b>hereda</b> todo lo que sabemos de los efectos de tiempo. La red lo deduce sin que nadie lo escriba.</p>
     </section>
 
     <!-- 2 · Relaciones -->
     <section class="slide" data-id="rels" data-label="Las flechas"
       data-notes="Cinco tipos de relación. Cada una se dibuja distinto. 'Es un' crea jerarquías y permite herencia; 'parte de' arma el todo; 'usa' son herramientas; 'afecta' es causa y efecto; 'va antes de' es el orden del proceso.">
-      <div class="abs eyebrow" style="left:100px;top:100px" data-a><i></i>Las flechas</div>
-      <h2 class="abs h2 split" style="left:96px;top:140px;width:1100px">Usamos cinco tipos de relación.</h2>
-      <div class="abs rels" style="left:100px;top:290px;width:1400px" id="relsGrid"></div>
+      <div class="abs eyebrow" style="left:100px;top:86px" data-a><i></i>Las flechas</div>
+      <h2 class="abs h2 split" style="left:94px;top:122px;width:1300px">Usamos cinco tipos de relación.</h2>
+      <div class="abs rels" style="left:100px;top:300px;width:1400px" id="relsGrid"></div>
     </section>
 
     <!-- 3 · Paso 1 -->
     <section class="slide" data-id="paso1" data-label="Paso 1 · Conceptos" data-steps="1"
       data-notes="Paso 1 de la actividad: identificar conceptos. Primero salen todos revueltos, como lluvia de ideas. Avanzar: se ordenan por etapa. Ahí ya se ven las jerarquías.">
-      <div class="abs eyebrow" style="left:100px;top:80px" data-a><i style="--c:var(--comp)"></i>Paso 1 de 3 · Conceptos</div>
-      <h2 class="abs h2 sm split" style="left:96px;top:118px;width:900px">Primero, juntamos los conceptos.</h2>
-      <p class="abs lead sm" style="left:100px;top:200px;width:820px" data-a data-until="0">Anotamos todo lo que interviene en producir una canción. Salieron <b class="nN"></b> conceptos.</p>
-      <p class="abs lead sm" style="left:100px;top:200px;width:820px" data-a data-step="1">Luego los agrupamos por etapa. Ahí empezaron a aparecer las jerarquías.</p>
+      <div class="abs eyebrow" style="left:100px;top:70px" data-a><i style="--c:var(--comp)"></i>Paso 1 de 3 · Conceptos</div>
+      <h2 class="abs h2 sm split" style="left:95px;top:100px;width:1000px">Primero, juntamos los conceptos.</h2>
+      <p class="abs lead sm" style="left:100px;top:206px;width:900px" data-a data-until="0">Anotamos todo lo que interviene en producir una canción. Salieron <b class="nN"></b> conceptos.</p>
+      <p class="abs lead sm" style="left:100px;top:206px;width:900px" data-a data-step="1">Luego los agrupamos por etapa. Ahí empezaron a aparecer las jerarquías.</p>
     </section>
 
     <!-- 4 · Paso 2 -->
     <section class="slide" data-id="paso2" data-label="Paso 2 · Relaciones"
       data-notes="Paso 2: establecer relaciones. Cada relación es una tripleta: sujeto, relación, objeto. Así la guarda una computadora; leerlas en voz alta: la saturación es una distorsión, etcétera.">
-      <div class="abs eyebrow" style="left:100px;top:130px" data-a><i style="--c:var(--diseno)"></i>Paso 2 de 3 · Relaciones</div>
-      <h2 class="abs h2 split" style="left:96px;top:175px;width:560px">Luego, conectamos cada par.</h2>
-      <p class="abs lead sm" style="left:100px;top:385px;width:520px" data-a>Cada conexión se lee como una oración de tres partes: <b>sujeto</b>, <b>relación</b> y <b>objeto</b>. Así es como también la guardaría una computadora.</p>
-      <p class="abs code" style="left:100px;top:600px;width:540px" data-a>(<b>saturación</b>, <s>es_un</s>, <u>distorsión</u>)</p>
-      <p class="abs cite" style="left:100px;top:650px" data-a>En total: <span class="nE"></span> relaciones.</p>
+      <svg class="abs bignum" style="left:-40px;top:250px;width:900px;height:700px" viewBox="0 0 900 700"><text x="0" y="640" style="stroke:var(--diseno)">2</text></svg>
+      <div class="abs col" style="left:100px;top:110px;width:600px">
+        <div class="eyebrow" data-a><i style="--c:var(--diseno)"></i>Paso 2 de 3 · Relaciones</div>
+        <h2 class="h2 split">Luego, conectamos cada par.</h2>
+        <p class="lead sm" style="width:540px" data-a>Cada conexión se lee como una oración de tres partes: <b>sujeto</b>, <b>relación</b> y <b>objeto</b>. Así es como también la guardaría una computadora.</p>
+        <p class="code" style="margin-top:18px" data-a>(<b>saturación</b>, <s>es_un</s>, <u>distorsión</u>)</p>
+        <p class="cite" data-a>En total: <span class="nE"></span> relaciones.</p>
+      </div>
       <div class="abs triples" style="left:740px;top:165px" id="triples" data-a></div>
     </section>
 
     <!-- 5 · Paso 3 -->
     <section class="slide" data-id="paso3" data-label="Paso 3 · La red"
       data-notes="Paso 3: dibujar la red. Las cuatro etapas van en orden con 'va antes de'. Pasar el cursor por un concepto muestra sus relaciones. Se pueden filtrar por tipo de relación. Ahora vamos por partes.">
-      <div class="abs eyebrow" style="left:90px;top:70px" data-a><i style="--c:var(--mezcla)"></i>Paso 3 de 3 · La red</div>
-      <h2 class="abs h2 sm split" style="left:86px;top:104px;width:700px">Y así se ve todo junto.</h2>
+      <div class="abs eyebrow" style="left:90px;top:62px" data-a><i style="--c:var(--mezcla)"></i>Paso 3 de 3 · La red</div>
+      <h2 class="abs h2 sm split" style="left:85px;top:92px;width:700px">Y así se ve todo junto.</h2>
       <div class="abs filters hit" style="right:60px;top:72px" id="filters" data-a></div>
       <p class="abs cite" style="right:62px;top:130px;text-align:right" data-a>Pasa el cursor sobre un concepto para ver sus relaciones.</p>
     </section>
@@ -299,10 +340,13 @@ em{font-style:italic}
     <!-- 6 · Composición -->
     <section class="slide" data-id="comp" data-label="Etapa 1 · Composición" data-stage="comp"
       data-notes="La composición es la raíz. No hay plugins todavía. Tocar la progresión I–V–vi–IV: es la de miles de canciones pop. El gancho es un tipo de melodía y casi siempre vive en el coro.">
-      <div class="abs eyebrow" style="left:90px;top:100px;--c:var(--comp)" data-a><i></i>Etapa 1 · Composición</div>
-      <h2 class="abs h2 md split" style="left:86px;top:140px;width:560px">Todo empieza con la canción.</h2>
-      <p class="abs lead sm" style="left:90px;top:300px;width:540px" data-a>Aquí todavía no hay plugins. Hay melodía, armonía, ritmo, letra y estructura. Es la raíz de la red: lo que no esté aquí, ninguna etapa posterior lo agrega.</p>
-      <div class="abs panel lab hit" style="left:90px;top:520px" data-a>
+      <svg class="abs bignum" style="left:-60px;top:170px;width:900px;height:760px" viewBox="0 0 900 760"><text x="0" y="700" style="stroke:var(--comp)">01</text></svg>
+      <div class="abs col" style="left:90px;top:88px;width:600px">
+        <div class="eyebrow" style="--c:var(--comp)" data-a><i></i>Etapa 1 · Composición</div>
+        <h2 class="h2 md split">Todo empieza con la canción.</h2>
+        <p class="lead sm" style="width:540px" data-a>Aquí todavía no hay plugins. Hay melodía, armonía, ritmo, letra y estructura. Es la raíz de la red: lo que no esté aquí, ninguna etapa posterior lo agrega.</p>
+      </div>
+      <div class="abs panel lab hit" style="left:90px;bottom:70px" data-a>
         <div class="lab-top"><span class="lab-title">La progresión del pop</span>
           <button class="play" id="playChords"><span class="ic"></span><span class="t">Escuchar</span></button></div>
         <div class="chords" id="chords">
@@ -316,12 +360,15 @@ em{font-style:italic}
     <!-- 7 · Diseño -->
     <section class="slide" data-id="diseno" data-label="Etapa 2 · Diseño de sonido" data-stage="diseno"
       data-notes="El diseño de sonido trabaja sobre el timbre. Probar cada botón: seno puro, AM, FM, saturación y filtro peine. Remarcar la herencia: la saturación es una distorsión, entonces también genera armónicos.">
-      <div class="abs eyebrow" style="left:90px;top:100px;--c:var(--diseno)" data-a><i></i>Etapa 2 · Diseño de sonido</div>
-      <h2 class="abs h2 md split" style="left:86px;top:140px;width:560px">Después, decidimos cómo suena cada cosa.</h2>
-      <p class="abs lead sm" style="left:90px;top:360px;width:540px" data-a>El diseño de sonido trabaja sobre el <b>timbre</b>: lo que hace que un piano y una guitarra suenen distinto aunque toquen la misma nota.</p>
-      <div class="abs panel lab hit" style="left:90px;top:530px" data-a>
+      <svg class="abs bignum" style="left:-60px;top:170px;width:900px;height:760px" viewBox="0 0 900 760"><text x="0" y="700" style="stroke:var(--diseno)">02</text></svg>
+      <div class="abs col" style="left:90px;top:88px;width:600px">
+        <div class="eyebrow" style="--c:var(--diseno)" data-a><i></i>Etapa 2 · Diseño de sonido</div>
+        <h2 class="h2 md split">Luego, le damos su sonido.</h2>
+        <p class="lead sm" style="width:540px" data-a>El diseño de sonido trabaja sobre el <b>timbre</b>: lo que hace que un piano y una guitarra suenen distinto aunque toquen la misma nota.</p>
+      </div>
+      <div class="abs panel lab hit" style="left:90px;bottom:62px" data-a>
         <div class="lab-top"><div class="tabs" id="waveTabs"></div></div>
-        <div class="wavebox"><span class="lbl" id="waveLbl">FORMA DE ONDA</span>
+        <div class="wavebox" style="height:130px"><span class="lbl" id="waveLbl">FORMA DE ONDA</span>
           <svg viewBox="0 0 512 150" preserveAspectRatio="none"><line class="axis" x1="0" x2="512" y1="75" y2="75"/>
             <path id="wavePath" fill="none" stroke="var(--diseno)" stroke-width="2.4" stroke-linejoin="round"/></svg></div>
         <p class="cap" id="waveCap"></p>
@@ -331,10 +378,13 @@ em{font-style:italic}
     <!-- 8 · Mezcla -->
     <section class="slide" data-id="mezcla" data-label="Etapa 3 · Mezcla" data-stage="mezcla"
       data-notes="Mezcla estática: niveles y paneo, quieta. Mezcla dinámica: automatización, se mueve. Demo de paneo (mejor con audífonos o bocinas estéreo) y demo de fase: dos ondas iguales, se invierte una y desaparece el sonido.">
-      <div class="abs eyebrow" style="left:90px;top:100px;--c:var(--mezcla)" data-a><i></i>Etapa 3 · Mezcla</div>
-      <h2 class="abs h2 md split" style="left:86px;top:140px;width:560px">Luego, hacemos que todo quepa.</h2>
-      <p class="abs lead sm" style="left:90px;top:300px;width:540px" data-a>Mezclar es repartir espacio: en volumen, en frecuencia, en estéreo y en el tiempo. Primero se deja quieta <span class="muted">(mezcla estática)</span> y luego se le da movimiento <span class="muted">(mezcla dinámica)</span>.</p>
-      <div class="abs panel lab hit" style="left:90px;top:520px" data-a>
+      <svg class="abs bignum" style="left:-60px;top:170px;width:900px;height:760px" viewBox="0 0 900 760"><text x="0" y="700" style="stroke:var(--mezcla)">03</text></svg>
+      <div class="abs col" style="left:90px;top:88px;width:600px">
+        <div class="eyebrow" style="--c:var(--mezcla)" data-a><i></i>Etapa 3 · Mezcla</div>
+        <h2 class="h2 md split">Después, que todo quepa.</h2>
+        <p class="lead sm" style="width:540px" data-a>Mezclar es repartir espacio: en volumen, en frecuencia, en estéreo y en el tiempo. Primero se deja quieta <span class="muted">(estática)</span> y luego se le da movimiento <span class="muted">(dinámica)</span>.</p>
+      </div>
+      <div class="abs panel lab hit" style="left:90px;bottom:62px" data-a>
         <div class="lab-top"><div class="tabs" id="mixTabs">
           <button class="chip on" data-m="paneo">Paneo</button><button class="chip" data-m="fase">Fase</button></div>
           <div style="display:flex;gap:8px"><button class="play ghost" id="phaseBtn" style="display:none"><span class="ic"></span><span class="t">Invertir fase</span></button>
@@ -358,24 +408,27 @@ em{font-style:italic}
     <!-- 9 · Master -->
     <section class="slide" data-id="master" data-label="Etapa 4 · Masterización" data-stage="master"
       data-notes="La masterización trabaja sobre la mezcla terminada. Prender y apagar el limitador: suena más fuerte pero pierde dinámica. En la red: el limitador es un tipo de compresión, por eso hereda que controla el rango dinámico. Dato de Spotify: normaliza a −14 LUFS.">
-      <div class="abs eyebrow" style="left:90px;top:100px;--c:var(--master)" data-a><i></i>Etapa 4 · Masterización</div>
-      <h2 class="abs h2 md split" style="left:86px;top:140px;width:560px">Al final, la preparamos para el mundo.</h2>
-      <p class="abs lead sm" style="left:90px;top:300px;width:540px" data-a>La masterización trabaja sobre la mezcla terminada, no sobre pistas sueltas. Ajusta el tono general, el estéreo y el volumen final.</p>
-      <div class="abs panel lab hit" style="left:90px;top:470px" data-a>
+      <svg class="abs bignum" style="left:-60px;top:170px;width:900px;height:760px" viewBox="0 0 900 760"><text x="0" y="700" style="stroke:var(--master)">04</text></svg>
+      <div class="abs col" style="left:90px;top:88px;width:600px">
+        <div class="eyebrow" style="--c:var(--master)" data-a><i></i>Etapa 4 · Masterización</div>
+        <h2 class="h2 md split">Al final, listo para el mundo.</h2>
+        <p class="lead sm" style="width:540px" data-a>Se trabaja sobre la mezcla terminada, no sobre pistas sueltas. Ajusta el tono general, el estéreo y el volumen final.</p>
+      </div>
+      <div class="abs panel lab hit" style="left:90px;bottom:160px" data-a>
         <div class="lab-top"><button class="play ghost" id="limBtn"><span class="ic"></span><span class="t">Limitador: apagado</span></button>
           <button class="play" id="playMaster"><span class="ic"></span><span class="t">Escuchar</span></button></div>
-        <div class="bars" id="bars"></div>
+        <div class="bars" id="bars" style="height:110px"></div>
         <div class="meter"><span>NIVEL</span><div class="bar"><i id="meterI"></i></div><span id="meterT">— dB</span></div>
       </div>
-      <div class="abs fact" style="left:90px;top:790px;width:560px" data-a><b>Dato</b><span>Spotify normaliza a −14 LUFS. Si tu master suena más fuerte, la plataforma le baja el volumen.</span></div>
+      <div class="abs fact" style="left:90px;bottom:62px;width:560px" data-a><b>Dato</b><span>Spotify normaliza a −14 LUFS. Si tu master suena más fuerte, la plataforma le baja el volumen.</span></div>
     </section>
 
     <!-- 10 · Inferencia -->
     <section class="slide" data-id="infer" data-label="Inferencia" data-steps="5"
       data-notes="Para qué sirve una red semántica en IA: inferencia. Cada pregunta se responde siguiendo flechas. La última es la mejor: no existe ningún camino desde la masterización hacia la composición. El master no arregla una mala canción.">
-      <div class="abs eyebrow" style="left:90px;top:70px" data-a><i style="--c:var(--master)"></i>Para qué sirve</div>
-      <h2 class="abs h2 sm split" style="left:86px;top:104px;width:600px">La red también puede razonar.</h2>
-      <p class="abs lead sm" style="left:90px;top:186px;width:350px;font-size:18px" data-a>Siguiendo las flechas, responde preguntas que nadie escribió directo. A eso se le llama <b>inferencia</b>.</p>
+      <div class="abs eyebrow" style="left:90px;top:62px" data-a><i style="--c:var(--master)"></i>Para qué sirve</div>
+      <h2 class="abs h2 sm split" style="left:85px;top:94px;width:820px;font-size:70px">La red también razona.</h2>
+      <p class="abs lead sm" style="left:90px;top:196px;width:350px;font-size:18px" data-a>Siguiendo las flechas, responde preguntas que nadie escribió directo. A eso se le llama <b>inferencia</b>.</p>
       <div class="abs qlist hit" style="left:90px;top:345px" id="qlist" data-a></div>
       <div class="abs panel answer hit" style="left:470px;top:715px;width:1070px;height:150px" data-a id="answer">
         <div class="chain" id="chain"></div>
@@ -385,16 +438,18 @@ em{font-style:italic}
 
     <!-- 11 · Cierre -->
     <section class="slide" data-id="cierre" data-label="En resumen"
-      data-notes="Cerrar con la idea central: la red no garantiza un hit, pero muestra que cada etapa depende de la anterior. Revisar los dos objetivos de la actividad: visualizar relaciones y aplicar jerarquías.">
-      <div class="abs eyebrow" style="left:100px;top:130px" data-a><i></i>En resumen</div>
-      <h2 class="abs h2 split" style="left:96px;top:172px;width:640px;font-size:86px">La red no garantiza un hit.</h2>
-      <p class="abs lead sm" style="left:100px;top:395px;width:600px" data-a>Pero sí muestra algo útil: cada decisión depende de otra. Una buena composición facilita el diseño, un buen diseño facilita la mezcla y una buena mezcla facilita el master.</p>
-      <div class="abs stats" style="left:100px;top:640px" data-a>
+      data-notes="Cerrar con la idea central: la red no garantiza un hit, pero muestra que cada etapa depende de la anterior. Revisar los objetivos de la actividad: visualizar relaciones y aplicar jerarquías.">
+      <div class="abs col" style="left:100px;top:110px;width:720px">
+        <div class="eyebrow" data-a><i></i>En resumen</div>
+        <h2 class="h2 split" style="font-size:104px">La red no garantiza un hit.</h2>
+        <p class="lead sm" style="width:600px" data-a>Pero sí muestra algo útil: cada decisión depende de otra. Una buena composición facilita el diseño, un buen diseño facilita la mezcla y una buena mezcla facilita el master.</p>
+      </div>
+      <div class="abs stats" style="left:100px;top:680px" data-a>
         <div class="stat"><b class="nN"></b><span>Conceptos</span></div>
         <div class="stat"><b class="nE"></b><span>Relaciones</span></div>
         <div class="stat"><b>5</b><span>Tipos de relación</span></div>
       </div>
-      <div class="abs checks" style="left:860px;top:250px">
+      <div class="abs checks" style="left:880px;top:220px">
         <div class="check" data-a><div class="ok"><svg viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9" fill="none" stroke="var(--mezcla)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <h4>Visualizar relaciones entre conceptos</h4><p>Cada flecha tiene nombre y tipo. La red se puede leer como oraciones.</p></div>
         <div class="check" data-a><div class="ok"><svg viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9" fill="none" stroke="var(--mezcla)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -404,14 +459,60 @@ em{font-style:italic}
       </div>
     </section>
 
-    <!-- 12 · Gracias -->
+    <!-- 12 · Estudio -->
+    <section class="slide" data-id="estudio" data-label="Estudio"
+      data-notes="Bonus: la red escuchando una canción real. Cargar los stems (o la demo) y darle play con espacio. Cada stem mueve una parte del visual: el bajo escala el anillo, la batería dispara ondas y partículas, la voz cambia el peso de la tipografía, la melodía dibuja la línea y los acordes cambian el color. Arriba se prenden los conceptos de la red. Abajo: LUFS, true peak, correlación estéreo y espectro.">
+      <div class="abs col" style="left:60px;top:52px;width:470px">
+        <div class="eyebrow" data-a><i style="--c:var(--diseno)"></i>Bonus · Estudio</div>
+        <h2 class="h2 sm split">La red escucha.</h2>
+      </div>
+      <div class="abs panel st-stems hit" style="left:60px;top:200px;width:470px;height:664px" data-a>
+        <div class="st-head"><span class="lab-title">Stems</span><span class="st-info" id="stInfo">Sin cargar</span></div>
+        <div class="st-list" id="stList"></div>
+        <div class="st-drop" id="stDrop">
+          <svg viewBox="0 0 48 48" width="40" height="40"><path d="M24 32V10m0 0l-8 8m8-8l8 8M10 30v6a2 2 0 002 2h24a2 2 0 002-2v-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <b>Arrastra tus stems aquí</b>
+          <span>Voz, bajo, batería, acordes, melodía. WAV o MP3. El rol se adivina por el nombre del archivo.</span>
+          <div class="st-drop-btns"><button class="play st" id="stPick"><span class="ic"></span><span class="t">Elegir archivos</span></button>
+            <button class="play ghost st" id="stDemo"><span class="ic"></span><span class="t">Usar demo</span></button></div>
+          <input type="file" id="stFile" multiple accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.flac,.aif,.aiff" hidden>
+        </div>
+      </div>
+      <div class="abs st-stage hit" style="left:560px;top:52px;width:990px;height:500px" data-a><canvas id="stCanvas"></canvas></div>
+      <div class="abs st-transport hit" style="left:560px;top:566px;width:990px" data-a>
+        <button class="play st" id="stPlay"><span class="ic"></span><span class="t">Reproducir</span></button>
+        <span class="st-time" id="stTime">0:00 / 0:00</span>
+        <span class="st-tag" id="stBpm">— BPM</span>
+        <span class="st-tag" id="stChord">Acorde —</span>
+        <label class="st-title">Título <input id="stTitle" value="hitazo" maxlength="14" spellcheck="false"></label>
+        <button class="play ghost st" id="stRec"><span class="ic rec"></span><span class="t">Grabar video</span></button>
+      </div>
+      <div class="abs st-tl hit" style="left:560px;top:616px;width:990px;height:100px" data-a><canvas id="stTimeline"></canvas></div>
+      <div class="abs st-meters" style="left:560px;top:728px;width:990px;height:136px" data-a><canvas id="stMeters"></canvas></div>
+    </section>
+
+    <!-- 13 · Gracias -->
     <section class="slide" data-id="fin" data-label="Gracias"
       data-notes="Gracias. Abrir a preguntas.">
-      <h1 class="abs display split" style="left:0;top:330px;width:1600px;text-align:center;font-size:200px">Gracias.</h1>
+      <h1 class="abs display split" style="left:0;top:270px;width:1600px;text-align:center;font-size:240px">Gracias.</h1>
       <p class="abs lead" style="left:0;top:560px;width:1600px;text-align:center" data-a>¿Preguntas?</p>
+      <div class="abs team center" style="left:200px;top:690px;width:1200px" data-a id="team2"></div>
     </section>
 
   </div>
+  <svg id="tx" viewBox="0 0 1600 900" aria-hidden="true">
+    <defs>
+      <filter id="goo" x="-5%" y="-20%" width="110%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="20" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -11"/></filter>
+      <pattern id="halftone" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="7" cy="7" r="2.3" fill="rgba(20,18,16,.18)"/></pattern>
+      <mask id="irm0" maskUnits="userSpaceOnUse" x="-300" y="-300" width="2200" height="1500"><rect x="-300" y="-300" width="2200" height="1500" fill="#fff"/><path id="irh0" fill="#000"/></mask>
+      <mask id="irm1" maskUnits="userSpaceOnUse" x="-300" y="-300" width="2200" height="1500"><rect x="-300" y="-300" width="2200" height="1500" fill="#fff"/><path id="irh1" fill="#000"/></mask>
+      <mask id="irm2" maskUnits="userSpaceOnUse" x="-300" y="-300" width="2200" height="1500"><rect x="-300" y="-300" width="2200" height="1500" fill="#fff"/><path id="irh2" fill="#000"/></mask>
+    </defs>
+    <g id="txIris" style="visibility:hidden"><g mask="url(#irm0)"><path id="iri0"/></g><g mask="url(#irm1)"><path id="iri1"/></g><g mask="url(#irm2)"><path id="iri2"/></g></g>
+    <g id="txLiquid" filter="url(#goo)" style="visibility:hidden"></g>
+  </svg>
+  <div id="txSlashH"></div>
+  <div id="txLabel"><div class="k-sub"></div><div class="k-main"></div></div>
   <div class="playhead" id="playhead"></div>
 </div>
 
@@ -426,16 +527,19 @@ em{font-style:italic}
 <script>/*@@GSAP@@*/</script>
 <script>/*@@MORPH@@*/</script>
 <script>/*@@SPLIT@@*/</script>
+<script>/*@@CUSTOMEASE@@*/</script>
 <script>
 /* ============================================================
    Edita aquí los nombres del equipo
    ============================================================ */
-const EQUIPO = "Equipo: Nombre Apellido · Nombre Apellido · Nombre Apellido";
+const EQUIPO = ['Robin Jay Aguilar García', 'Diego Alberto Lopez Navia', 'José Manuel Toro Villalvazo', 'Daniel Alejandro Cervantes Guzmán'];
 
 const GRAPH = /*@@GRAPH@@*/null;
 const LAYOUT = /*@@LAYOUT@@*/null;
 
-gsap.registerPlugin(MorphSVGPlugin, SplitText);
+gsap.registerPlugin(MorphSVGPlugin, SplitText, CustomEase);
+CustomEase.create('settle', 'M0,0 C0.12,0 0.2,1.14 0.44,1.05 0.6,0.99 0.74,1 1,1');
+CustomEase.create('whip', 'M0,0 C0.6,0 0.1,1 1,1');
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -478,7 +582,8 @@ $$('.nN').forEach(e => e.textContent = nodes.length);
 $$('.nE').forEach(e => e.textContent = edges.length);
 $$('.nIs').forEach(e => e.textContent = edges.filter(e => e.type === 'es_un').length);
 $$('.nPart').forEach(e => e.textContent = edges.filter(e => e.type === 'parte_de').length);
-$('#team').textContent = EQUIPO;
+$('#team').innerHTML = '<span class="lbl">Equipo</span>' + EQUIPO.map((n, i) => `<span style="--c:${['var(--comp)', 'var(--diseno)', 'var(--mezcla)', 'var(--master)'][i % 4]}">${n}</span>`).join('');
+$('#team2').innerHTML = $('#team').innerHTML.replace(/<span class="lbl">Equipo<\/span>/, '');
 
 /* layouts: scatter / grid / net */
 const LAY = { net: {}, grid: {}, scatter: {} };
@@ -570,7 +675,17 @@ function camFor(key) {
   const list = nodes.filter(n => n.stage === key || (key === 'master' && n.stage === 'dist'));
   return fitCam(bbox(list), { x: 700, y: 80, w: 860, h: 740 }, 1.6);
 }
-function camTo(key, dur = 1.5) { const c = typeof key === 'string' ? camFor(key) : key; gsap.to(cam, { ...c, duration: dur, ease: 'expo.inOut', onUpdate: applyCam, overwrite: true }); }
+let chromaTw = null;
+function chromaPulse(dur) {
+  if (REDUCED) return; const o = { d: 0 }; chromaTw?.kill(); G.style.filter = 'url(#chroma)';
+  chromaTw = gsap.to(o, { d: 1, duration: dur / 2, yoyo: true, repeat: 1, ease: 'sine.inOut', onUpdate: () => { $('#chR').setAttribute('dx', -9 * o.d); $('#chB').setAttribute('dx', 9 * o.d); }, onComplete: () => { G.style.filter = ''; } });
+}
+function camTo(key, dur = 1.5) {
+  const c = typeof key === 'string' ? camFor(key) : key;
+  const moved = Math.abs(c.x - cam.x) + Math.abs(c.y - cam.y) + Math.abs(c.w - cam.w) > 40;
+  gsap.to(cam, { ...c, duration: dur, ease: 'expo.inOut', onUpdate: applyCam, overwrite: true });
+  if (moved && dur > .8 && graphState.visible) chromaPulse(dur);
+}
 
 /* emphasis */
 function emphasize({ nodeOp, edgeOp, labelOp, hot = new Set(), trail = new Set(), dur = .5 }) {
@@ -658,13 +773,14 @@ function ringPath(R, amp, k, ph = 0, k2 = 0, amp2 = 0, N = 220) {
   return d + 'Z';
 }
 const BLOB = {
-  hero:   { x: 1190, y: 440, s: 1, o: 1, sh: [[300, 16, 9, 0, 3, 10], [250, 22, 6, 1, 0, 0], [200, 12, 14, 2, 0, 0]] },
+  hero:   { x: 1240, y: 450, s: 1.02, o: 1, sh: [[300, 16, 9, 0, 3, 10], [250, 22, 6, 1, 0, 0], [200, 12, 14, 2, 0, 0]] },
   que:    { x: 1500, y: 110, s: .38, o: .45, sh: [[300, 6, 5, 0, 0, 0], [250, 10, 3, 1, 0, 0], [200, 6, 7, 2, 0, 0]] },
   rels:   { x: 1500, y: 120, s: .4, o: .45, sh: [[300, 30, 12, 0, 0, 0], [250, 14, 4, 1, 0, 0], [200, 10, 9, 2, 0, 0]] },
   graph:  { x: 800, y: 470, s: 1.9, o: .08, sh: [[300, 4, 3, 0, 0, 0], [250, 4, 4, 1, 0, 0], [200, 4, 5, 2, 0, 0]] },
   lab:    { x: 370, y: 700, s: .9, o: .14, sh: [[300, 26, 7, 0, 2, 12], [250, 14, 11, 1, 0, 0], [200, 18, 5, 2, 0, 0]] },
   cierre: { x: 1450, y: 800, s: .5, o: .3, sh: [[300, 10, 4, 0, 0, 0], [250, 18, 7, 1, 0, 0], [200, 8, 10, 2, 0, 0]] },
-  fin:    { x: 800, y: 430, s: 1.35, o: .55, sh: [[300, 0, 1, 0, 0, 0], [250, 0, 1, 0, 0, 0], [200, 0, 1, 0, 0, 0]] },
+  off:    { x: 800, y: 450, s: .2, o: 0, sh: [[300, 6, 5, 0, 0, 0], [250, 6, 5, 0, 0, 0], [200, 6, 5, 0, 0, 0]] },
+  fin:    { x: 800, y: 440, s: 1.32, o: .55, sh: [[300, 0, 1, 0, 0, 0], [250, 0, 1, 0, 0, 0], [200, 0, 1, 0, 0, 0]] },
 };
 const rings = ['#ring1', '#ring2', '#ring3'].map(s => $(s));
 function blobTo(key, first) {
@@ -698,7 +814,7 @@ function audio() {
 }
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
 let current = null;
-function stopAll() { if (current) { current.stop(); current = null; } $$('.play:not(.ghost)').forEach(b => { b.classList.remove('on'); b.querySelector('.t').textContent = 'Escuchar'; }); $$('#waveTabs .chip').forEach(c => c.classList.remove('on')); $$('.chord').forEach(c => c.classList.remove('on')); }
+function stopAll() { if (current) { current.stop(); current = null; } $$('.play:not(.ghost):not(.st)').forEach(b => { b.classList.remove('on'); b.querySelector('.t').textContent = 'Escuchar'; }); $$('#waveTabs .chip').forEach(c => c.classList.remove('on')); $$('.chord').forEach(c => c.classList.remove('on')); }
 function bus(level = 1) { const g = AC.createGain(); g.gain.value = 0; g.gain.setTargetAtTime(level, AC.currentTime, .02); g.connect(MASTER); return g; }
 function endBus(g, extra) { g.gain.setTargetAtTime(0, AC.currentTime, .04); setTimeout(() => { try { g.disconnect(); } catch (e) { } extra && extra(); }, 400); }
 function seq(stepDur, fn) { let next = AC.currentTime + .08, i = 0; const tick = () => { while (next < AC.currentTime + .15) { fn(i, next); next += stepDur; i++; } }; tick(); const id = setInterval(tick, 25); return () => clearInterval(id); }
@@ -814,6 +930,7 @@ function playMaster() {
 const scope = $('#scope'), sctx = scope.getContext('2d'); let buf = new Float32Array(2048);
 function drawScope(ts) {
   sctx.clearRect(0, 0, 1600, 900);
+  if (curSlideId() === 'estudio') { requestAnimationFrame(drawScope); return; }
   const y0 = 872; sctx.lineWidth = 1.5; sctx.strokeStyle = 'rgba(238,231,219,.5)'; sctx.beginPath();
   let live = false, rms = 0;
   if (AN && current) { AN.getFloatTimeDomainData(buf); live = true; for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i]; rms = Math.sqrt(rms / buf.length); }
@@ -833,7 +950,7 @@ requestAnimationFrame(drawScope);
 const slides = $$('.slide');
 let cur = -1, step = 0;
 const curSlideId = () => slides[cur] && slides[cur].dataset.id;
-const SLIDE_COLOR = { comp: 'var(--comp)', diseno: 'var(--diseno)', mezcla: 'var(--mezcla)', master: 'var(--master)', paso1: 'var(--comp)', paso2: 'var(--diseno)', paso3: 'var(--mezcla)', infer: 'var(--master)' };
+const SLIDE_COLOR = { estudio: 'var(--diseno)', comp: 'var(--comp)', diseno: 'var(--diseno)', mezcla: 'var(--mezcla)', master: 'var(--master)', paso1: 'var(--comp)', paso2: 'var(--diseno)', paso3: 'var(--mezcla)', infer: 'var(--master)' };
 const prog = $('#prog');
 slides.forEach((s, i) => { const sp = document.createElement('span'); sp.style.setProperty('--c', SLIDE_COLOR[s.dataset.id] || 'var(--ink)'); sp.title = s.dataset.label; sp.onclick = () => go(i); prog.appendChild(sp); });
 
@@ -843,15 +960,23 @@ function splitOf(el) { if (!el._split) el._split = SplitText.create(el, { type: 
 
 function animateIn(s, k) {
   gsap.set(s, { autoAlpha: 1 }); s.classList.add('on');
-  $$('.split', s).forEach((el, i) => { const sp = splitOf(el); gsap.set(el, { autoAlpha: 1 }); gsap.fromTo(sp.lines, { yPercent: 118, rotate: 1.5 }, { yPercent: 0, rotate: 0, duration: 1.15, ease: 'expo.out', stagger: .09, delay: .32 + i * .1, overwrite: true }); });
+  $$('.split', s).forEach((el, i) => {
+    const sp = splitOf(el); gsap.set(el, { autoAlpha: 1 });
+    gsap.fromTo(sp.lines, { yPercent: 122, rotate: 2.5, skewX: -8 }, { yPercent: 0, rotate: 0, skewX: 0, duration: 1.2, ease: 'expo.out', stagger: .085, delay: .12 + i * .1, overwrite: true });
+    gsap.fromTo(sp.lines, { textShadow: '-10px 0 rgba(255,50,90,.75), 10px 0 rgba(40,210,255,.75)' }, { textShadow: '0px 0 rgba(255,50,90,0), 0px 0 rgba(40,210,255,0)', duration: 1.1, ease: 'power3.out', stagger: .085, delay: .12 + i * .1 });
+  });
   const show = itemsOf(s).filter(el => visibleAt(el, k)), hide = itemsOf(s).filter(el => !visibleAt(el, k));
   gsap.set(hide, { autoAlpha: 0 });
-  gsap.fromTo(show, { autoAlpha: 0, y: 26, filter: 'blur(8px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: .95, ease: 'expo.out', stagger: .07, delay: .5, overwrite: true, clearProps: 'filter' });
+  gsap.fromTo(show, { autoAlpha: 0, y: 34, filter: 'blur(10px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1, ease: 'settle', stagger: .07, delay: .3, overwrite: true, clearProps: 'filter' });
+  show.filter(el => el.classList.contains('panel')).forEach((el, i) => gsap.fromTo(el, { clipPath: 'inset(0% 0% 100% 0% round 22px)' }, { clipPath: 'inset(0% 0% 0% 0% round 22px)', duration: 1.1, ease: 'expo.inOut', delay: .35 + i * .08, clearProps: 'clipPath' }));
+  $$('.bignum text', s).forEach(t => { const L = 9000; gsap.fromTo(t, { strokeDasharray: L, strokeDashoffset: L, x: 80 }, { strokeDashoffset: 0, x: 0, duration: 2.6, ease: 'power2.inOut', delay: .2 }); });
+  const gl = GLOW[s.dataset.id]; if (gl) gsap.to('#glow', { '--g': gl[0], '--gx': gl[1], '--gy': gl[2], duration: 1.6, ease: 'power2.inOut' });
 }
+const GLOW = { hero: ['#E9B44C', '74%', '46%'], que: ['#F07155', '78%', '42%'], rels: ['#A393F5', '86%', '16%'], paso1: ['#E9B44C', '50%', '70%'], paso2: ['#F07155', '78%', '46%'], paso3: ['#45C4B0', '50%', '56%'], comp: ['#E9B44C', '72%', '45%'], diseno: ['#F07155', '72%', '45%'], mezcla: ['#45C4B0', '72%', '45%'], master: ['#A393F5', '72%', '45%'], infer: ['#A393F5', '66%', '40%'], cierre: ['#45C4B0', '78%', '48%'], estudio: ['#F07155', '62%', '30%'], fin: ['#A393F5', '50%', '48%'] };
 function animateOut(s) {
   s.classList.remove('on');
   const els = [...itemsOf(s), ...$$('.split', s).flatMap(el => el._split ? el._split.lines : [])];
-  gsap.to(itemsOf(s), { autoAlpha: 0, y: -14, duration: .35, ease: 'power2.in', overwrite: true });
+  gsap.to(itemsOf(s), { autoAlpha: 0, y: -18, filter: 'blur(6px)', duration: .32, ease: 'power2.in', overwrite: true, stagger: .02 });
   $$('.split', s).forEach(el => el._split && gsap.to(el._split.lines, { yPercent: -118, duration: .4, ease: 'power2.in', overwrite: true }));
   gsap.to(s, { autoAlpha: 0, duration: .01, delay: .42 });
 }
@@ -865,20 +990,24 @@ function stepTo(k) {
   HOOK[s.dataset.id]?.step?.(k, prevK);
   updateUI();
 }
+let busy = false;
 function go(i, dir = 1, atEnd = false) {
-  if (i < 0 || i >= slides.length || i === cur) return;
+  if (busy || i < 0 || i >= slides.length || i === cur) return;
   stopAll();
   const prevS = slides[cur]; if (prevS) { animateOut(prevS); HOOK[prevS.dataset.id]?.leave?.(); }
-  const first = cur === -1; cur = i; const s = slides[i];
+  const first = cur === -1; cur = i; const s = slides[i]; const id = s.dataset.id;
   step = atEnd ? +(s.dataset.steps || 0) : 0;
-  if (!first && !REDUCED) gsap.fromTo('#playhead', { x: dir > 0 ? -30 : 1630, opacity: 1 }, { x: dir > 0 ? 1630 : -30, duration: 1.05, ease: 'power2.inOut', onComplete: () => gsap.set('#playhead', { opacity: 0 }) });
-  animateIn(s, step);
-  const id = s.dataset.id;
-  blobTo(({ hero: 'hero', que: 'que', rels: 'rels', paso2: 'rels', comp: 'lab', diseno: 'lab', mezcla: 'lab', master: 'lab', cierre: 'cierre', fin: 'fin' })[id] || 'graph', first);
-  HOOK[id]?.enter?.(step, dir);
-  if (!HOOK[id]?.graph) applyGraph({ visible: false, mode: 'none' });
   history.replaceState(null, '', '#' + (i + 1));
   updateUI();
+  const enter = () => {
+    animateIn(s, step);
+    blobTo(({ hero: 'hero', que: 'que', rels: 'rels', paso2: 'rels', comp: 'lab', diseno: 'lab', mezcla: 'lab', master: 'lab', cierre: 'cierre', estudio: 'off', fin: 'fin' })[id] || 'graph', first);
+    HOOK[id]?.enter?.(step, dir);
+    if (!HOOK[id]?.graph) applyGraph({ visible: false, mode: 'none' });
+  };
+  if (first || REDUCED) { enter(); return; }
+  busy = true;
+  runTx(id, dir, () => { busy = false; enter(); });
 }
 function next() { const s = slides[cur]; const n = +(s.dataset.steps || 0); if (step < n) stepTo(step + 1); else go(cur + 1, 1); }
 function prev() { if (step > 0) stepTo(step - 1); else go(cur - 1, -1, true); }
@@ -896,7 +1025,11 @@ HOOK.paso1 = {
   step(k) { applyGraph({ layout: k ? 'grid' : 'scatter' }); },
 };
 HOOK.paso3 = { graph: true, enter() { applyGraph({ visible: true, layout: 'net', edges: true, cam: 'overview', mode: 'overview' }); } };
-for (const st of ['comp', 'diseno', 'mezcla', 'master']) HOOK[st] = { graph: true, enter() { applyGraph({ visible: true, layout: 'net', edges: true, cam: st, mode: 'focus', focus: st }); } };
+for (const st of ['comp', 'diseno', 'mezcla', 'master']) HOOK[st] = { graph: true, enter() {
+  applyGraph({ visible: true, layout: 'net', edges: true, cam: st, mode: 'focus', focus: st });
+  nodes.filter(n => n.stage === st || (st === 'master' && n.stage === 'dist')).sort((a, b) => a.y - b.y).forEach((n, i) => gsap.fromTo(n.el, { scale: .6 }, { scale: 1, duration: 1.1, delay: .55 + i * .045, ease: 'elastic.out(1,.55)', overwrite: 'auto' }));
+} };
+HOOK.estudio = { enter() { stEnter(); }, leave() { stLeave(); } };
 HOOK.infer = {
   graph: true,
   enter(k) { inferSel = null; applyGraph({ visible: true, layout: 'net', edges: true, cam: 'infer', mode: 'infer' }); if (k) setTimeout(() => ask(k - 1), 1300); else resetAnswer(); },
@@ -1056,7 +1189,9 @@ function ask(i) {
 /* ---------------- input ---------------- */
 addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.target.closest && e.target.closest('input,select,textarea')) return;
   const k = e.key;
+  if (k === ' ' && curSlideId() === 'estudio') { e.preventDefault(); stToggle(); return; }
   if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); next(); }
   else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); prev(); }
   else if (k === 'Home') go(0, -1); else if (k === 'End') go(slides.length - 1, 1);
@@ -1072,10 +1207,16 @@ addEventListener('touchend', e => { if (tx0 == null) return; const dx = e.change
 document.fonts.ready.then(() => {
   buildGraph(); buildMini();
   nodes.forEach(n => { n.el.addEventListener('mouseenter', () => hoverNode(n)); n.el.addEventListener('mouseleave', unhover); });
+  $$('.play, .chip, .navb, .q').forEach(el => {
+    el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); gsap.to(el, { x: ((e.clientX - r.left) / r.width - .5) * 10, y: ((e.clientY - r.top) / r.height - .5) * 8, duration: .4, ease: 'power3.out' }); });
+    el.addEventListener('pointerleave', () => gsap.to(el, { x: 0, y: 0, duration: .9, ease: 'elastic.out(1,.35)' }));
+  });
   gsap.set(G, { autoAlpha: 0 }); applyCam();
   const start = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1)) || 1) - 1));
   go(start, 1);
 });
 </script>
+<script>/*@@TX@@*/</script>
+<script>/*@@ESTUDIO@@*/</script>
 </body>
 </html>

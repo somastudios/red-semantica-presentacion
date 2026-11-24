@@ -1,0 +1,39 @@
+/* ---------- estudio ---------- */
+.st-stems{display:flex;flex-direction:column;padding:18px 18px 16px;gap:12px;transition:box-shadow .3s,border-color .3s}
+.st-stems.over{border-color:var(--diseno);box-shadow:0 0 0 2px var(--diseno) inset,0 0 60px rgba(240,113,85,.25)}
+.st-head{display:flex;justify-content:space-between;align-items:center}
+.st-info{font:400 12px var(--mono);color:var(--muted);letter-spacing:.04em}
+.st-list{display:flex;flex-direction:column;gap:8px;overflow:auto;flex:1;min-height:0}
+.st-list:empty{display:none}
+.st-row{display:grid;grid-template-columns:10px 1fr 8px 30px 30px 18px;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:rgba(238,231,219,.035);border:1px solid var(--line)}
+.st-dot{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 12px var(--c)}
+.st-name{display:flex;flex-direction:column;gap:3px;min-width:0}
+.st-name b{font:500 15px var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-name select{appearance:none;-webkit-appearance:none;background:none;border:0;color:var(--c);font:400 12px var(--mono);letter-spacing:.06em;cursor:pointer;padding:0;width:max-content}
+.st-name select option{background:#1A1815;color:var(--ink)}
+.st-lvl{width:8px;height:34px;border-radius:4px;background:rgba(238,231,219,.08);overflow:hidden;display:flex;align-items:flex-end}
+.st-lvl i{display:block;width:100%;height:100%;background:var(--c);transform-origin:bottom;transform:scaleY(0)}
+.st-sm{width:30px;height:30px;border-radius:9px;border:1px solid var(--line2);font:500 12px var(--mono);color:var(--ink2);transition:all .2s}
+.st-sm:hover{border-color:var(--ink2)}
+.st-sm.on{background:var(--ink);color:#141210;border-color:var(--ink)}
+.st-sm[data-k=solo].on{background:var(--comp);border-color:var(--comp)}
+.st-x{color:var(--dim);font-size:20px;line-height:1}
+.st-x:hover{color:var(--diseno)}
+.st-drop{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;border:1.5px dashed var(--line2);border-radius:16px;padding:24px;color:var(--ink2)}
+.st-drop b{font:400 34px/1.05 var(--serif);color:var(--ink)}
+.st-drop span{font:400 14px/1.5 var(--sans);color:var(--muted);max-width:330px}
+.st-drop-btns{display:flex;gap:8px;margin-top:8px}
+.st-drop.compact{flex:0 0 auto;padding:10px;border-radius:14px}
+.st-drop.compact > svg,.st-drop.compact > b,.st-drop.compact > span{display:none}
+.st-drop.compact .st-drop-btns{margin:0}
+.st-stage{border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.st-stage canvas,.st-tl canvas,.st-meters canvas{display:block}
+.st-transport{display:flex;align-items:center;gap:12px}
+.st-time{font:400 15px var(--mono);color:var(--ink);min-width:116px}
+.st-tag{font:400 12px var(--mono);letter-spacing:.08em;color:var(--muted);padding:7px 10px;border:1px solid var(--line);border-radius:8px;white-space:nowrap}
+.st-title{margin-left:auto;font:400 11px var(--mono);color:var(--muted);display:flex;align-items:center;gap:8px;letter-spacing:.1em;text-transform:uppercase}
+.st-title input{background:rgba(238,231,219,.05);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 14px var(--sans);padding:7px 10px;width:120px;letter-spacing:0;outline:none}
+.st-title input:focus{border-color:var(--ink2)}
+.st-tl canvas{cursor:ew-resize}
+.play .ic.rec::before{border:0;width:10px;height:10px;border-radius:50%;background:#F07155;margin:0}
+.play.on .ic.rec::before{border-radius:2px}

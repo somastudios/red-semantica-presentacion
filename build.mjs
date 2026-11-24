@@ -10,6 +10,10 @@ const parts = {
   '/*@@GSAP@@*/': r('vendor/gsap.min.js'),
   '/*@@MORPH@@*/': r('vendor/MorphSVGPlugin.min.js'),
   '/*@@SPLIT@@*/': r('vendor/SplitText.min.js'),
+  '/*@@CUSTOMEASE@@*/': r('vendor/CustomEase.min.js'),
+  '/*@@ESTUDIO_CSS@@*/': r('src/estudio.css'),
+  '/*@@TX@@*/': r('src/tx.js'),
+  '/*@@ESTUDIO@@*/': r('src/estudio.js'),
   '/*@@GRAPH@@*/null': JSON.stringify(JSON.parse(r('src/graph.json'))),
   '/*@@LAYOUT@@*/null': r('src/layout.json').trim(),
 };
