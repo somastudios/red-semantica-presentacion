@@ -62,7 +62,7 @@ function showResult(r) {
   $$('.q').forEach(b => b.classList.toggle('on', b.dataset.q === r.text));
   nodes.forEach(n => gsap.to(n.el, { scale: 1, duration: .4 }));
   if (r.kind === 'empty') {
-    at.innerHTML = '<b>Mmm.</b>No encontré conceptos de la red en tu pregunta. Prueba con algo como «¿La saturación cambia el timbre?».';
+    at.innerHTML = 'No encontré conceptos de la red en tu pregunta, deberías probar con otra palabra.';
     baseEmphasis(.4); inferSel = null; camTo('infer', 1.2);
   } else if (r.kind === 'path') {
     const lit = new Set([r.path[0].s, ...r.path.map(e => e.t)]), es = new Set(r.path.map(e => e.i));
@@ -112,7 +112,7 @@ CIN.addEventListener('blur', () => CMP.classList.remove('focus'));
 CIN.addEventListener('keydown', e => { if (e.key === 'Escape') CIN.blur(); });
 CMP.addEventListener('submit', e => {
   e.preventDefault(); const t = CIN.value; if (!t.trim()) return;
-  runQuery(t); CIN.value = ''; syncSend(); CIN.placeholder = 'Pregunta otra cosa…';
+  runQuery(t); CIN.value = ''; syncSend(); CIN.placeholder = 'Pregunta otra cosa';
   gsap.fromTo(CSEND, { scale: .82 }, { scale: 1, duration: .6, ease: 'back.out(3)' });
 });
 let typing = null;
@@ -123,7 +123,7 @@ function composerType(text) {
 $('#cMode').onclick = () => {
   askMode = askMode === 'razonar' ? 'explicar' : 'razonar';
   $('#cModeT').textContent = askMode === 'razonar' ? 'Razonar' : 'Explicar';
-  CIN.placeholder = askMode === 'razonar' ? 'Pregúntale algo a la red…' : 'Escribe un concepto para explicarlo…';
+  CIN.placeholder = askMode === 'razonar' ? 'Pregúntale algo a la red' : 'Escribe un concepto para explicarlo';
   gsap.fromTo('#cModeT', { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: .4, ease: 'expo.out' });
 };
 $('#cAttach').onclick = () => { $('#stFile').click(); const i = slides.findIndex(s => s.dataset.id === 'estudio'); if (cur !== i) go(i, 1); };
@@ -136,7 +136,7 @@ $('#cAttach').onclick = () => { $('#stFile').click(); const i = slides.findIndex
     rec = new SR(); rec.lang = 'es-MX'; rec.interimResults = true;
     mic.classList.add('rec'); CIN.placeholder = 'Te escucho…';
     rec.onresult = e => { CIN.value = [...e.results].map(r => r[0].transcript).join(''); syncSend(); };
-    rec.onerror = e => { CIN.placeholder = e.error === 'network' ? 'El dictado necesita internet.' : 'No te escuché bien. Intenta de nuevo.'; };
+    rec.onerror = e => { CIN.placeholder = e.error === 'network' ? 'El dictado necesita internet.' : 'No te escuché bien, inténtalo de nuevo.'; };
     rec.onend = () => { mic.classList.remove('rec'); rec = null; if (CIN.value.trim()) CMP.requestSubmit(); };
     rec.start();
   };
