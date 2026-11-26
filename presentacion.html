@@ -607,7 +607,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webki
           <span id="stDropD">El rol de cada stem se adivina por el nombre del archivo, puedes cambiarlo después.</span>
           <div class="st-drop-btns"><button class="play st" id="stPick"><span class="ic plus"></span><span class="t">Elegir archivos</span></button>
             <button class="play ghost st" id="stDemo"><span class="ic"></span><span class="t">Usar demo</span></button></div>
-          <input type="file" id="stFile" multiple accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.flac,.aif,.aiff" hidden>
+          <input type="file" id="stFile" multiple accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.flac,.aif,.aiff,.zip,application/zip" hidden>
         </div>
       </div>
       <div class="abs st-stage hit" style="left:560px;top:52px;width:990px;height:500px" data-a><canvas id="stCanvas"></canvas></div>
@@ -1384,7 +1384,7 @@ let tx0 = null; addEventListener('touchstart', e => tx0 = e.touches[0].clientX, 
 addEventListener('touchend', e => { if (tx0 == null) return; const dx = e.changedTouches[0].clientX - tx0; if (Math.abs(dx) > 50) dx < 0 ? next() : prev(); tx0 = null; });
 
 /* ---------------- boot ---------------- */
-document.fonts.ready.then(() => {
+Promise.all([document.fonts.ready, new Promise(r => document.readyState === 'loading' ? addEventListener('DOMContentLoaded', r) : r())]).then(() => {
   buildGraph(); buildMini();
   nodes.forEach(n => { n.el.addEventListener('mouseenter', () => hoverNode(n)); n.el.addEventListener('mouseleave', unhover); });
   $$('.play, .chip, .navb, .q').forEach(el => {
@@ -2206,11 +2206,11 @@ addEventListener('keydown', e => { if (e.key === '/' && !(e.target.closest && e.
    LUFS (aprox. BS.1770), true peak, correlación y espectro.
    ============================================================ */
 const ROLES = {
-  voz:     { ini: 'V', name: 'Voz',      color: '#ff574a', re: /voz|vocal|vox|voice|acapella|canto|coro/i, node: 'Letra' },
-  bateria: { ini: 'Bt', name: 'Batería',  color: '#ffc93c', re: /drum|bater|perc|kick|snare|hat|beat|bombo|tambor|loop/i, node: 'Ritmo' },
+  voz:     { ini: 'V', name: 'Voz',      color: '#ff574a', re: /voz|vocal|vox|voice|acapella|canto|coro|adlib|chorus/i, node: 'Letra' },
+  bateria: { ini: 'Bt', name: 'Batería',  color: '#ffc93c', re: /drum|bater|perc|kick|snare|hat|beat|bombo|tambor|loop|clap|cymbal|crash|ride|tom|shaker|rim/i, node: 'Ritmo' },
   bajo:    { ini: 'Bj', name: 'Bajo',     color: '#b68cff', re: /bajo|bass|808|sub/i, node: 'Rango dinámico' },
-  melodia: { ini: 'M', name: 'Melodía',  color: '#3f83ff', re: /melod|lead|hook|arp|line|riff/i, node: 'Melodía' },
-  acordes: { ini: 'A', name: 'Acordes',  color: '#24cf72', re: /acord|chord|keys|piano|pad|guitar|guitarra|synth|rhodes|organ|teclado/i, node: 'Armonía' },
+  melodia: { ini: 'M', name: 'Melodía',  color: '#3f83ff', re: /melod|lead|hook|arp|line|riff|pluck|bell|flute|sax|brass/i, node: 'Melodía' },
+  acordes: { ini: 'A', name: 'Acordes',  color: '#24cf72', re: /acord|chord|keys|piano|pad|guitar|guitarra|synth|rhodes|organ|teclado|string/i, node: 'Armonía' },
   otro:    { ini: 'O', name: 'Otro',     color: '#efece4', re: /$^/, node: '' },
 };
 const ROLE_ORDER = ['voz', 'bateria', 'bajo', 'melodia', 'acordes'];
@@ -2248,15 +2248,71 @@ function stAddStem(name, buf, role) {
   ST.stems.push({ name, role: role || guessRole(name), buf, g, an, src: null, mute: false, solo: false, lvl: 0, rms: 0, peaks: wavePeaks(buf, 900), td: new Float32Array(4096), fd: new Float32Array(2048) });
   ST.dur = Math.max(ST.dur, buf.duration);
 }
-async function stAddFiles(files) {
-  files = [...files].filter(f => /^audio\//.test(f.type) || /\.(wav|mp3|m4a|aac|ogg|flac|aif|aiff)$/i.test(f.name));
-  if (!files.length) return;
-  stPause(); audio(); stAudio(); stBusy('La red está leyendo tus archivos');
-  for (const f of files) {
-    try { stAddStem(f.name.replace(/\.[^.]+$/, ''), await SA.c.decodeAudioData(await f.arrayBuffer())); }
-    catch (e) { stToast(`No se pudo leer ${f.name}, deberías probar con un WAV o MP3.`); }
+/* ---------- zip: un proyecto completo (por ejemplo, las pistas exportadas de FL Studio) ---------- */
+const AUDIO_RE = /\.(wav|mp3|m4a|aac|ogg|flac|aif|aiff)$/i;
+const esZip = f => /\.zip$/i.test(f.name) || /zip/.test(f.type);
+async function inflar(bytes) {
+  const s = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(s).arrayBuffer());
+}
+async function leeZip(file) {
+  const buf = new Uint8Array(await file.arrayBuffer()), dv = new DataView(buf.buffer);
+  let e = -1;
+  for (let i = buf.length - 22; i >= Math.max(0, buf.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { e = i; break; }
+  if (e < 0) throw new Error('no es zip');
+  let n = dv.getUint16(e + 10, true), off = dv.getUint32(e + 16, true);
+  if ((off === 0xffffffff || n === 0xffff) && e >= 20 && dv.getUint32(e - 20, true) === 0x07064b50) {
+    const z = Number(dv.getBigUint64(e - 12, true));
+    n = Number(dv.getBigUint64(z + 32, true)); off = Number(dv.getBigUint64(z + 48, true));
   }
-  await stAnalyze(); stRenderList(); stBusy(null);
+  const td = new TextDecoder(), out = [];
+  for (let k = 0, p = off; k < n && dv.getUint32(p, true) === 0x02014b50; k++) {
+    const flags = dv.getUint16(p + 8, true), method = dv.getUint16(p + 10, true);
+    let csize = dv.getUint32(p + 20, true), usize = dv.getUint32(p + 24, true), lho = dv.getUint32(p + 42, true);
+    const nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+    const name = td.decode(buf.subarray(p + 46, p + 46 + nl));
+    for (let x = p + 46 + nl; x < p + 46 + nl + el;) {
+      const id = dv.getUint16(x, true), sz = dv.getUint16(x + 2, true); let q = x + 4;
+      if (id === 1) {
+        if (usize === 0xffffffff) { usize = Number(dv.getBigUint64(q, true)); q += 8; }
+        if (csize === 0xffffffff) { csize = Number(dv.getBigUint64(q, true)); q += 8; }
+        if (lho === 0xffffffff) { lho = Number(dv.getBigUint64(q, true)); }
+      }
+      x += 4 + sz;
+    }
+    p += 46 + nl + el + cl;
+    const base = name.split('/').pop();
+    if (!AUDIO_RE.test(base) || /(^|\/)(__MACOSX|\.)/.test(name)) continue;
+    if (flags & 1) throw new Error('cifrado');
+    const ini = lho + 30 + dv.getUint16(lho + 26, true) + dv.getUint16(lho + 28, true);
+    const datos = buf.subarray(ini, ini + csize);
+    if (method !== 0 && method !== 8) continue;
+    out.push(new File([method === 0 ? datos : await inflar(datos)], base));
+  }
+  return out.sort((a, b) => a.name.localeCompare(b.name, 'es', { numeric: true }));
+}
+
+async function stAddFiles(files) {
+  files = [...files];
+  const zips = files.filter(esZip);
+  files = files.filter(f => !esZip(f) && (/^audio\//.test(f.type) || AUDIO_RE.test(f.name)));
+  if (!files.length && !zips.length) return;
+  stPause(); audio(); stAudio(); stBusy('La red está leyendo tus archivos');
+  let aviso = null;
+  const deZip = [];
+  for (const z of zips) {
+    try { deZip.push(...await leeZip(z)); }
+    catch (e) { aviso = `No se pudo abrir ${z.name}, deberías exportarlo de nuevo sin contraseña.`; }
+  }
+  // un zip es un proyecto completo: si trae pistas, reemplazan a las que había
+  if (deZip.length) { ST.stems.forEach(s => s.g.disconnect()); ST.stems = []; ST.dur = 0; ST.off = 0; ST.last = 0; }
+  for (const f of [...deZip, ...files]) {
+    try { stAddStem(f.name.replace(/\.[^.]+$/, ''), await SA.c.decodeAudioData(await f.arrayBuffer())); }
+    catch (e) { aviso = `No se pudo leer ${f.name}, deberías probar con un WAV o MP3.`; }
+  }
+  if (ST.stems.length) await stAnalyze();
+  stRenderList(); stBusy(null);
+  if (aviso) stToast(aviso);
 }
 async function stLoadDemo() {
   stPause(); audio(); stAudio(); stBusy('La red está armando la demo');

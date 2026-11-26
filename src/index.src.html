@@ -253,7 +253,7 @@
           <span id="stDropD">El rol de cada stem se adivina por el nombre del archivo, puedes cambiarlo después.</span>
           <div class="st-drop-btns"><button class="play st" id="stPick"><span class="ic plus"></span><span class="t">Elegir archivos</span></button>
             <button class="play ghost st" id="stDemo"><span class="ic"></span><span class="t">Usar demo</span></button></div>
-          <input type="file" id="stFile" multiple accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.flac,.aif,.aiff" hidden>
+          <input type="file" id="stFile" multiple accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.flac,.aif,.aiff,.zip,application/zip" hidden>
         </div>
       </div>
       <div class="abs st-stage hit" style="left:560px;top:52px;width:990px;height:500px" data-a><canvas id="stCanvas"></canvas></div>
@@ -986,7 +986,7 @@ let tx0 = null; addEventListener('touchstart', e => tx0 = e.touches[0].clientX, 
 addEventListener('touchend', e => { if (tx0 == null) return; const dx = e.changedTouches[0].clientX - tx0; if (Math.abs(dx) > 50) dx < 0 ? next() : prev(); tx0 = null; });
 
 /* ---------------- boot ---------------- */
-document.fonts.ready.then(() => {
+Promise.all([document.fonts.ready, new Promise(r => document.readyState === 'loading' ? addEventListener('DOMContentLoaded', r) : r())]).then(() => {
   buildGraph(); buildMini();
   nodes.forEach(n => { n.el.addEventListener('mouseenter', () => hoverNode(n)); n.el.addEventListener('mouseleave', unhover); });
   $$('.play, .chip, .navb, .q').forEach(el => {

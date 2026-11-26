@@ -27,6 +27,8 @@ La barra de abajo acepta preguntas en español ("¿La saturación cambia el timb
 
 La diapositiva 13 es un estudio: arrastra stems (voz, bajo, batería, acordes, melodía) o usa la demo, y dale play con Espacio.
 
+También acepta un `.zip` con todas las pistas de un proyecto (por ejemplo, las exportadas de FL Studio): toma solo el audio, ignora el resto (.flp, carpetas de Mac) y reemplaza las pistas que había. Funciona con zips comprimidos o sin comprimir, sin contraseña.
+
 - El rol de cada stem se adivina por el nombre del archivo (`vocal`, `bass`, `drums`, `keys`, `lead`…) y se puede cambiar.
 - Todas las pistas arrancan en la misma muestra. Hay solo, mute y búsqueda en la línea de tiempo.
 - Bajo → escala el anillo · batería → ondas y partículas (onsets detectados offline) · melodía → la línea y la forma del anillo · voz → peso de la tipografía · acordes → color (acorde estimado por croma).
